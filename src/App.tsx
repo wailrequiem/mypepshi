@@ -9,6 +9,7 @@ import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PageTransition } from "@/components/layout/PageTransition";
 import Index from "./pages/Index";
+import Onboarding from "./pages/Onboarding";
 import Paywall from "./pages/Paywall";
 import Dashboard from "./pages/Dashboard";
 import NewScan from "./pages/NewScan";
@@ -27,6 +28,11 @@ function AnimatedRoutes() {
         <Route path="/" element={
           <PageTransition>
             <Index />
+          </PageTransition>
+        } />
+        <Route path="/onboarding" element={
+          <PageTransition>
+            <Onboarding />
           </PageTransition>
         } />
         <Route path="/paywall" element={

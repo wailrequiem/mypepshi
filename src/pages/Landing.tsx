@@ -7,7 +7,7 @@ import { FAQ } from "@/components/landing/FAQ";
 import { CTA } from "@/components/landing/CTA";
 import { Footer } from "@/components/landing/Footer";
 
-export default function Index() {
+export default function Landing() {
   return (
     <main className="min-h-screen">
       <Header />
