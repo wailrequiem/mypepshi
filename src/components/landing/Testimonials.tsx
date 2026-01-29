@@ -1,4 +1,6 @@
 import { Quote, Sparkles, Star } from "lucide-react";
+import marcusBeforeAfter from "@/assets/testimonial-marcus-before-after.jpg";
+import sarahBeforeAfter from "@/assets/testimonial-sarah-before-after.png";
 
 const testimonials = [
   {
@@ -18,12 +20,14 @@ const testimonials = [
     role: "Fitness Coach",
     content: "I loved how the app gave me practical, easy-to-follow tasks. It feels like a coach that knows my face better than I do.",
     rating: 5,
+    image: marcusBeforeAfter,
   },
   {
-    name: "James L.",
+    name: "Sarah L.",
     role: "Student",
     content: "Honestly, I didn't expect much… but the scan felt incredibly precise. The feedback was clear, personalized, and easy to apply.",
     rating: 5,
+    image: sarahBeforeAfter,
   },
   {
     name: "Oliver P.",
@@ -73,6 +77,17 @@ export function Testimonials() {
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div>
+              
+              {/* Before/After Image */}
+              {'image' in testimonial && testimonial.image && (
+                <div className="mb-4 -mx-6 -mt-2">
+                  <img
+                    src={testimonial.image}
+                    alt={`${testimonial.name} transformation`}
+                    className="w-full h-auto rounded-t-2xl"
+                  />
+                </div>
+              )}
               
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {`"${testimonial.content}"`}

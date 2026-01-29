@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const footerLinks = {
   product: [
@@ -42,13 +42,12 @@ export function Footer() {
         <div className="grid gap-8 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-                PepMaxx
-              </span>
+            <Link to="/" className="flex items-center">
+              <img 
+                src={logo} 
+                alt="MyPepMaxx" 
+                className="h-10 w-auto object-contain"
+              />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               AI-powered bio-optimization and facial analysis to help you unlock your full potential.
@@ -109,7 +108,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-sm text-muted-foreground">
-            {`© ${new Date().getFullYear()} PepMaxx. All rights reserved.`}
+            {`© ${new Date().getFullYear()} MyPepMaxx. All rights reserved.`}
           </p>
           <div className="flex gap-6">
             <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">

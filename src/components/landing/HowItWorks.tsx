@@ -1,4 +1,10 @@
 import { Camera, BarChart3, Lightbulb, Sparkles } from "lucide-react";
+import { useState } from "react";
+import step1_a from "@/assets/how-it-works/step1_a.jpg";
+import step1_b from "@/assets/how-it-works/step1_b.jpg";
+import step2 from "@/assets/how-it-works/step2.jpg";
+import step3 from "@/assets/how-it-works/step3.jpg";
+import step4 from "@/assets/how-it-works/step4.jpg";
 
 const steps = [
   {
@@ -6,26 +12,93 @@ const steps = [
     icon: Camera,
     title: "Upload Your Photo",
     description: "Take a clear, front-facing photo with neutral lighting. Our AI handles the rest.",
+    images: [step1_a, step1_b],
   },
   {
     number: "02",
     icon: BarChart3,
     title: "Get Your Analysis",
     description: "Receive a detailed breakdown of your facial features, symmetry, and potential improvements.",
+    image: step2,
   },
   {
     number: "03",
     icon: Lightbulb,
     title: "Follow Your Plan",
     description: "Get personalized recommendations and weekly tasks tailored to your unique profile.",
+    image: step3,
   },
   {
     number: "04",
     icon: Sparkles,
     title: "Track Your Progress",
     description: "Monitor your transformation journey and see measurable improvements over time.",
+    image: step4,
   },
 ];
+
+// Media component with error handling
+function MediaBlock({ images, image }: { images?: string[]; image?: string }) {
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+
+  const handleImageError = (src: string) => {
+    setImageErrors((prev) => new Set(prev).add(src));
+  };
+
+  // Fallback gradient when image fails to load
+  const FallbackGradient = () => (
+    <div className="w-full h-full rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent" />
+  );
+
+  // Render two images side-by-side for step 01
+  if (images && images.length === 2) {
+    return (
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        {images.map((src, idx) => (
+          <div
+            key={idx}
+            className="relative rounded-xl border border-white/10 shadow-[0_0_30px_rgba(34,211,238,0.08)] bg-secondary/30 overflow-hidden"
+          >
+            {imageErrors.has(src) ? (
+              <div className="w-full h-[150px]">
+                <FallbackGradient />
+              </div>
+            ) : (
+              <img
+                src={src}
+                alt={`Step visual ${idx + 1}`}
+                className="w-full h-auto"
+                onError={() => handleImageError(src)}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Render single image for other steps
+  if (image) {
+    return (
+      <div className="mb-4 rounded-xl border border-white/10 shadow-[0_0_30px_rgba(34,211,238,0.08)] bg-secondary/30 overflow-hidden">
+        {imageErrors.has(image) ? (
+          <div className="w-full h-[180px]">
+            <FallbackGradient />
+          </div>
+        ) : (
+          <img
+            src={image}
+            alt="Step visual"
+            className="w-full h-auto"
+            onError={() => handleImageError(image)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export function HowItWorks() {
   return (
@@ -68,6 +141,13 @@ export function HowItWorks() {
                 <div className="mb-4 mt-4 flex h-14 w-14 items-center justify-center rounded-xl bg-secondary">
                   <step.icon className="h-7 w-7 text-primary" />
                 </div>
+                
+                {/* Media Block */}
+                <MediaBlock 
+                  images={'images' in step ? step.images : undefined} 
+                  image={'image' in step ? step.image : undefined} 
+                />
+                
                 <h3 className="text-lg font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
                   {step.title}
                 </h3>
