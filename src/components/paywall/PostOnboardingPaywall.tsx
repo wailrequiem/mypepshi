@@ -351,9 +351,16 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
           </p>
         )}
         {user && (
+        {!user && (
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Sign up to unlock your personalized plan
+          </p>
+        )}
+        {user && (
           <p className="text-center text-xs text-muted-foreground mt-2">
             3 days full access, then $29/month. Cancel anytime.
           </p>
+        )}
         )}
         {checkoutError && (
           <p className="text-center text-xs text-red-500 mt-2">
