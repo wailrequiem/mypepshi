@@ -141,10 +141,21 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
 
   const startCamera = async () => {
     setCameraStatus("requesting");
+    console.log("📷 [Camera] Starting camera...");
+    
     try {
       let mediaStream: MediaStream;
+      
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error("📷 [Camera] getUserMedia not supported");
+        setCameraStatus("error");
+        return;
+      }
+      
       try {
         // Try with ideal resolution and front camera
+        console.log("📷 [Camera] Trying with ideal settings...");
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "user",
@@ -153,14 +164,16 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
           },
           audio: false,
         });
-      } catch {
+      } catch (e1) {
+        console.warn("📷 [Camera] Ideal settings failed, trying fallback 1...", e1);
         // Fallback: try without resolution constraints
         try {
           mediaStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: "user" },
             audio: false,
           });
-        } catch {
+        } catch (e2) {
+          console.warn("📷 [Camera] Fallback 1 failed, trying fallback 2...", e2);
           // Final fallback: any video source
           mediaStream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -168,14 +181,45 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
           });
         }
       }
+      
+      console.log("📷 [Camera] Got media stream:", mediaStream);
+      console.log("📷 [Camera] Video tracks:", mediaStream.getVideoTracks());
+      
       setStream(mediaStream);
+      
       if (videoRef.current) {
+        console.log("📷 [Camera] Setting video srcObject...");
         videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          console.log("📷 [Camera] Video metadata loaded");
+        };
+        
+        try {
+          await videoRef.current.play();
+          console.log("📷 [Camera] Video playing successfully");
+        } catch (playError) {
+          console.error("📷 [Camera] Video play failed:", playError);
+          // Try to play again after a short delay
+          setTimeout(async () => {
+            try {
+              await videoRef.current?.play();
+              console.log("📷 [Camera] Video playing after retry");
+            } catch (retryError) {
+              console.error("📷 [Camera] Video play retry failed:", retryError);
+            }
+          }, 100);
+        }
+      } else {
+        console.error("📷 [Camera] videoRef.current is null!");
       }
+      
       setCameraStatus("active");
+      console.log("📷 [Camera] Camera status set to active");
+      
     } catch (err) {
-      console.error("Camera error:", err);
+      console.error("📷 [Camera] Camera error:", err);
       setCameraStatus("error");
     }
   };
@@ -191,19 +235,34 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas) {
+      console.error("📸 [Capture] Video or canvas ref is null");
+      return;
+    }
+
+    console.log("📸 [Capture] Starting capture...", {
+      videoWidth: video.videoWidth,
+      videoHeight: video.videoHeight,
+      readyState: video.readyState
+    });
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) {
+      console.error("📸 [Capture] Could not get canvas context");
+      return;
+    }
 
+    // Mirror the image horizontally (since video is mirrored for selfie view)
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0);
     
     // Compress image to reduce size (quality 0.7 = good balance)
     const photoData = canvas.toDataURL("image/jpeg", 0.7);
     
-    console.log("📸 Photo captured:", {
+    console.log("📸 [Capture] Photo captured:", {
       width: canvas.width,
       height: canvas.height,
       sizeKB: Math.round(photoData.length / 1024)
@@ -371,26 +430,29 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
         </p>
 
         <div className="relative w-64 h-80 rounded-3xl bg-surface/50 border border-border overflow-hidden mb-4">
-          {cameraStatus === "active" && stream ? (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <canvas ref={canvasRef} className="hidden" />
-            </>
-          ) : cameraStatus === "requesting" ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+          {/* Video element always rendered, hidden when not active */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            style={{ 
+              display: cameraStatus === "active" && stream ? "block" : "none",
+              transform: "scaleX(-1)" // Mirror effect for selfie camera
+            }}
+            className="absolute inset-0 w-full h-full object-cover z-10"
+          />
+          <canvas ref={canvasRef} className="hidden" />
+          
+          {cameraStatus === "active" && stream ? null : cameraStatus === "requesting" ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-0">
               <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-3" />
               <p className="text-sm text-muted-foreground text-center">
                 Requesting camera permission...
               </p>
             </div>
           ) : cameraStatus === "error" ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-0">
               <Camera className="w-12 h-12 text-destructive mb-3" />
               <p className="text-sm text-destructive text-center font-medium mb-2">
                 Camera access denied
@@ -400,7 +462,7 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
               </p>
             </div>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-0">
               <Camera className="w-12 h-12 text-muted-foreground/30" />
             </div>
           )}
