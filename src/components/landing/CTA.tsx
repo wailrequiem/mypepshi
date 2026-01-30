@@ -32,7 +32,7 @@ export function CTA() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to="/onboarding" className="w-full sm:w-auto">
               <Button size="lg" className="w-full">
-                Start Free Analysis
+                Get Your Analysis Now
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>

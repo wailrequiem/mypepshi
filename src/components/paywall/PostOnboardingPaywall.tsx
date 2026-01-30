@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Shield, Lock, Check, Users, Clock, Star, ChevronLeft, Mail, Sparkles } from "lucide-react";
+import { ChevronRight, Shield, Lock, Check, Users, Clock, Star, ChevronLeft, Mail, Sparkles, Loader2 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { LockedPeptideCoachSection } from "@/components/payment/LockedPeptideCoachSection";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { BeforeAfterReviewsCarousel } from "@/components/paywall/BeforeAfterReviewsCarousel";
+import { redirectToCheckout } from "@/lib/stripe";
 
 // Image imports (Vite asset handling)
 import paywallBefore from "@/assets/paywall-before.png";
 import paywallAfter from "@/assets/paywall-after.png";
 import glowupPlan from "@/assets/glowup-plan.png";
+import reviewMarcusPhoto from "@/assets/review-marcus-photo.png";
+import reviewJordanPhoto from "@/assets/review-jordan-photo.png";
 
 interface PostOnboardingPaywallProps {
   onUnlock: () => void;
@@ -19,9 +22,11 @@ interface PostOnboardingPaywallProps {
 
 export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywallProps) {
   const { user } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState<string>("1month");
+  const [selectedPlan, setSelectedPlan] = useState<string>("trial");
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes in seconds
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const pricingSectionRef = useRef<HTMLDivElement>(null);
   const peptideScrollRef = useRef<HTMLDivElement>(null);
 
@@ -43,13 +48,34 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
     pricingSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleGlowUpNow = () => {
+  const handleGlowUpNow = async () => {
     if (!user) {
       console.log("🔐 [Paywall] User not authenticated, showing auth modal");
       setShowAuthModal(true);
-    } else {
-      console.log("✅ [Paywall] User authenticated, proceeding to unlock");
-      onUnlock();
+      return;
+    }
+
+    // Start Stripe checkout
+    console.log("💳 [Paywall] User authenticated, starting Stripe checkout...");
+    setIsCheckoutLoading(true);
+    setCheckoutError(null);
+
+    try {
+      const result = await redirectToCheckout({
+        successUrl: `${window.location.origin}/dashboard?payment=success`,
+        cancelUrl: `${window.location.origin}/paywall?payment=cancelled`,
+      });
+
+      if (result?.error) {
+        console.error("❌ [Paywall] Checkout error:", result.error);
+        setCheckoutError(result.error);
+        setIsCheckoutLoading(false);
+      }
+      // If successful, user will be redirected to Stripe
+    } catch (error: any) {
+      console.error("❌ [Paywall] Checkout error:", error);
+      setCheckoutError(error.message || "Payment error");
+      setIsCheckoutLoading(false);
     }
   };
 
@@ -60,9 +86,16 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
   };
 
   const plans = [
-    { id: "7days", name: "7-day plan", price: "$0.99", originalPrice: "$2.99", perDay: "", highlight: false },
-    { id: "1month", name: "1-month plan", price: "$19.99", originalPrice: "$39.99", perDay: "$0.66/day", highlight: true, badge: "MOST POPULAR" },
-    { id: "3months", name: "3-month plan", price: "$34.99", originalPrice: "$69.99", perDay: "$0.38/day", highlight: false },
+    { 
+      id: "trial", 
+      name: "Start with 3-day trial", 
+      price: "$1", 
+      originalPrice: "", 
+      perDay: "then $29/month", 
+      highlight: true, 
+      badge: "BEST VALUE",
+      description: "Try full premium access for just $1"
+    },
   ];
 
   const scoreComparison = [
@@ -78,14 +111,16 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
 
   const finalReviews = [
     {
-      image: "😊",
+      image: reviewMarcusPhoto,
+      isPhoto: true,
       text: "After 8 weeks, my jawline is more defined and my skin looks completely different. People keep asking what I changed.",
       name: "Marcus",
       age: 26,
       duration: "3 months",
     },
     {
-      image: "🙂",
+      image: reviewJordanPhoto,
+      isPhoto: true,
       text: "I was skeptical but the personalized approach actually worked. My confidence is way higher now and I've lost stubborn fat.",
       name: "Jordan",
       age: 22,
@@ -296,13 +331,33 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
       >
         <button 
           onClick={handleGlowUpNow}
-          className="w-full py-4 px-6 rounded-2xl bg-accent text-accent-foreground font-bold text-base shadow-lg shadow-accent/30 hover:shadow-accent/50 transition-all active:scale-[0.98]"
+          disabled={isCheckoutLoading}
+          className="w-full py-4 px-6 rounded-2xl bg-accent text-accent-foreground font-bold text-base shadow-lg shadow-accent/30 hover:shadow-accent/50 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {user ? "Glow Up Now" : "Create Account to Continue"}
+          {isCheckoutLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Processing...
+            </>
+          ) : user ? (
+            "Start Trial for $1"
+          ) : (
+            "Create Account to Continue"
+          )}
         </button>
         {!user && (
           <p className="text-center text-xs text-muted-foreground mt-2">
             Sign up to unlock your personalized plan
+          </p>
+        )}
+        {user && (
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            3 days full access, then $29/month. Cancel anytime.
+          </p>
+        )}
+        {checkoutError && (
+          <p className="text-center text-xs text-red-500 mt-2">
+            {checkoutError}
           </p>
         )}
       </motion.div>
@@ -414,10 +469,15 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
         >
           <button 
             onClick={handleGlowUpNow}
-            className="w-full py-3.5 px-6 rounded-2xl bg-primary/20 border border-primary text-primary font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            disabled={isCheckoutLoading}
+            className="w-full py-3.5 px-6 rounded-2xl bg-primary/20 border border-primary text-primary font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-70"
           >
-            <Lock className="w-4 h-4" />
-            {user ? "Get My Full Peptide Recommendations" : "Sign Up to View Recommendations"}
+            {isCheckoutLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Lock className="w-4 h-4" />
+            )}
+            {user ? "Unlock for $1" : "Sign Up to View Recommendations"}
           </button>
         </motion.div>
       </motion.div>
@@ -452,9 +512,19 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
               className="glass rounded-2xl p-4 border border-border premium-glow"
             >
               {/* Review Image */}
-              <div className="w-16 h-16 mx-auto mb-3 rounded-xl bg-surface flex items-center justify-center">
-                <span className="text-3xl">{review.image}</span>
-              </div>
+              {review.isPhoto ? (
+                <div className="w-full aspect-[2/1] mx-auto mb-4 rounded-xl bg-surface overflow-hidden">
+                  <img 
+                    src={review.image} 
+                    alt={`${review.name} transformation`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-16 h-16 mx-auto mb-3 rounded-xl bg-surface flex items-center justify-center">
+                  <span className="text-3xl">{review.image}</span>
+                </div>
+              )}
               <div className="flex justify-center mb-3">
                 <StarRating />
               </div>
@@ -463,7 +533,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
               </p>
               <div className="mt-3 flex items-center justify-center gap-2">
                 <span className="text-xs font-semibold text-foreground">{review.name}, {review.age}</span>
-                <span className="text-xs text-muted-foreground">• Used Maxxing for {review.duration}</span>
+                <span className="text-xs text-muted-foreground">• Used MyPepMaxx for {review.duration}</span>
               </div>
             </motion.div>
           ))}
@@ -479,10 +549,15 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
       >
         <button 
           onClick={handleGlowUpNow}
-          className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-base glow-accent flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          disabled={isCheckoutLoading}
+          className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-base glow-accent flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-70"
         >
-          <Lock className="w-5 h-5" />
-          {user ? "Get My Glow-Up Plan" : "Create Account to Get Plan"}
+          {isCheckoutLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Lock className="w-5 h-5" />
+          )}
+          {user ? "Start Trial for $1" : "Create Account to Get Plan"}
         </button>
       </motion.div>
 
@@ -496,16 +571,19 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
         {/* Card 1 - Subscription Disclosure */}
         <div className="glass rounded-2xl p-4 border border-border">
           <h4 className="text-sm font-semibold text-foreground mb-2">
-            This is an auto-renewing subscription.
+            How the trial works
           </h4>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Your first payment is $19.99 as an introductory offer. All future payments of your Maxxing Premium subscription will be automatically charged the full price of $39.99 every 1 month unless cancelled.
+            <strong>Today:</strong> Pay $1 for instant access to all premium features for 3 days.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-            You can cancel the subscription via app settings or by contacting support.
+            <strong>After 3 days:</strong> Your subscription automatically renews at $29/month unless cancelled.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-            This subscription is bound by our Privacy Policy, Terms of Use, Fulfillment Policy and Refund Policy.
+            You can cancel anytime from your account settings or by contacting support - no questions asked.
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+            This subscription is bound by our Privacy Policy, Terms of Use, and Refund Policy.
           </p>
         </div>
 

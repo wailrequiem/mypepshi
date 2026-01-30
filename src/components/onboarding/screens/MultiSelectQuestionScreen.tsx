@@ -36,6 +36,14 @@ export function MultiSelectQuestionScreen({
 }: MultiSelectQuestionScreenProps) {
   const [selected, setSelected] = useState<string[]>([]);
 
+  // Determine if this question has only one possible answer
+  const hasOnlyOneOption = options.length === 1;
+  
+  // Show Continue button if:
+  // - Multi-select (user needs to confirm selections)
+  // - OR single-select with multiple options (user has a real choice)
+  const showContinueButton = multiSelect || !hasOnlyOneOption;
+
   const toggleOption = (value: string) => {
     if (multiSelect) {
       setSelected(prev => 
@@ -45,8 +53,10 @@ export function MultiSelectQuestionScreen({
       );
     } else {
       setSelected([value]);
-      // Auto-advance for single select
-      setTimeout(() => onNext([value]), 300);
+      // Auto-advance ONLY if there's just 1 option (no real choice)
+      if (hasOnlyOneOption) {
+        setTimeout(() => onNext([value]), 300);
+      }
     }
   };
 
@@ -95,19 +105,21 @@ export function MultiSelectQuestionScreen({
         </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="pb-4 pt-4"
-      >
-        <PrimaryButton
-          onClick={() => onNext(selected)}
-          disabled={selected.length === 0}
+      {showContinueButton && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="pb-4 pt-4"
         >
-          Continue
-        </PrimaryButton>
-      </motion.div>
+          <PrimaryButton
+            onClick={() => onNext(selected)}
+            disabled={selected.length === 0}
+          >
+            Continue
+          </PrimaryButton>
+        </motion.div>
+      )}
     </PageContainer>
   );
 }

@@ -128,7 +128,7 @@ export function BeforeAfterReviewsCarousel() {
               <div className="flex items-center justify-between mb-3">
                 <StarRating rating={review.rating} />
                 <span className="text-[10px] text-muted-foreground">
-                  Used Maxxing for {review.usedMonths} {review.usedMonths === 1 ? "month" : "months"}
+                  Used MyPepMaxx for {review.usedMonths} {review.usedMonths === 1 ? "month" : "months"}
                 </span>
               </div>
 
