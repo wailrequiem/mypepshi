@@ -1,16 +1,20 @@
 /**
  * Save Authenticated User Scan
  * 
- * Directly saves a scan for already authenticated users:
- * 1. Upload photos to Supabase Storage
- * 2. Call analyze-face Edge Function
- * 3. Save scan to database
- * 4. Generate personalized glow-up plan
+ * Directly saves a scan for authenticated AND PAID users:
+ * 1. Check payment status (REQUIRED)
+ * 2. Upload photos to Supabase Storage
+ * 3. Call analyze-face Edge Function
+ * 4. Save scan to database
+ * 5. Generate personalized glow-up plan
  * 
  * Used when authenticated users do "New Scan" from dashboard
+ * 
+ * IMPORTANT: This function BLOCKS if user has not paid.
  */
 
 import { supabase } from "./supabase";
+import { requirePaidAccess } from "./accessState";
 
 export interface SaveScanResult {
   success: boolean;
@@ -36,6 +40,9 @@ function dataURLtoBlob(dataURL: string): Blob {
 
 /**
  * Main function: Save authenticated user scan directly to database
+ * 
+ * CRITICAL: This function ONLY runs if the user has paid.
+ * If user has not paid, it returns early with PAYMENT_REQUIRED error.
  */
 export async function saveAuthenticatedScan(
   frontPhotoBase64: string,
@@ -44,7 +51,20 @@ export async function saveAuthenticatedScan(
   console.log("🚀 [NEW_SCAN] Starting authenticated scan save...");
 
   try {
-    // 1. Check authentication
+    // 0. PAYMENT GATE - Check if user has paid BEFORE any uploads
+    const accessResult = await requirePaidAccess();
+    if (!accessResult.allowed) {
+      console.warn("🚫 [NEW_SCAN] BLOCKED: User has not paid - no uploads allowed");
+      return { 
+        success: false, 
+        error: accessResult.reason || "PAYMENT_REQUIRED", 
+        step: "payment_check" 
+      };
+    }
+
+    console.log("✅ [NEW_SCAN] Payment verified, proceeding with scan save...");
+
+    // 1. Get user (already verified in requirePaidAccess, but need the user object)
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       console.error("❌ [NEW_SCAN] User not authenticated:", authError);

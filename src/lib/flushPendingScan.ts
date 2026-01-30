@@ -1,15 +1,19 @@
 /**
  * Flush Pending Scan to Supabase
  * 
- * Automatically processes guest scans after authentication:
- * 1. Upload photos to Supabase Storage
- * 2. Call analyze-face Edge Function
- * 3. Save scan to database
- * 4. Clear pending scan from localStorage
+ * Processes guest scans ONLY AFTER PAYMENT:
+ * 1. Check payment status (REQUIRED)
+ * 2. Upload photos to Supabase Storage
+ * 3. Call analyze-face Edge Function
+ * 4. Save scan to database
+ * 5. Clear pending scan from localStorage
+ * 
+ * IMPORTANT: This function BLOCKS if user has not paid.
  */
 
 import { supabase } from "./supabase";
 import { loadPendingScan, clearPendingScan } from "./pendingScan";
+import { requirePaidAccess } from "./accessState";
 
 export interface FlushResult {
   success: boolean;
@@ -35,11 +39,27 @@ function dataURLtoBlob(dataURL: string): Blob {
 
 /**
  * Main function: Flush pending scan to Supabase
+ * 
+ * CRITICAL: This function ONLY runs if the user has paid.
+ * If user has not paid, it returns early with PAYMENT_REQUIRED error.
  */
 export async function flushPendingScanToSupabase(): Promise<FlushResult> {
   console.log("🚀 [PENDING] Starting flush to Supabase...");
 
   try {
+    // 0. PAYMENT GATE - Check if user has paid BEFORE any uploads
+    const accessResult = await requirePaidAccess();
+    if (!accessResult.allowed) {
+      console.warn("🚫 [PENDING] BLOCKED: User has not paid - no uploads allowed");
+      return { 
+        success: false, 
+        error: accessResult.reason || "PAYMENT_REQUIRED", 
+        step: "payment_check" 
+      };
+    }
+
+    console.log("✅ [PENDING] Payment verified, proceeding with flush...");
+
     // 1. Load pending scan
     const pendingScan = loadPendingScan();
     if (!pendingScan) {
@@ -47,7 +67,7 @@ export async function flushPendingScanToSupabase(): Promise<FlushResult> {
       return { success: false, error: "No pending scan found", step: "load" };
     }
 
-    // 2. Check authentication
+    // 2. Get user (already verified in requirePaidAccess, but need the user object)
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       console.error("❌ [PENDING] User not authenticated:", authError);

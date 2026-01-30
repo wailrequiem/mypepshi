@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { saveGuestPhotos } from "@/lib/guestPhotos";
 import { saveAuthenticatedScan } from "@/lib/saveAuthenticatedScan";
 import { useAuth } from "@/contexts/AuthContext";
+import { checkHasPaid } from "@/lib/accessState";
 
 type ScanStep = "front" | "front_confirm" | "side" | "side_confirm" | "saving";
 type ScanMode = "onboarding" | "newScan";
@@ -40,14 +41,14 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
     };
   }, [stream]);
 
-  // Save photos to localStorage and redirect to paywall
+  // Save photos - ONLY uploads to Supabase if user has paid
   useEffect(() => {
     if (step === "saving" && frontPhoto && sidePhoto) {
       console.log("💾 [ScanFlow] Both photos captured, processing...");
       
       if (mode === "onboarding") {
-        // ONBOARDING MODE: Save to localStorage for later processing
-        console.log("🔄 [ScanFlow] Onboarding mode - saving to localStorage");
+        // ONBOARDING MODE: Save to localStorage for later processing (after payment)
+        console.log("🔄 [ScanFlow] Onboarding mode - saving to localStorage (NO upload)");
         const saved = saveGuestPhotos({
           frontPhotoBase64: frontPhoto,
           sidePhotoBase64: sidePhoto,
@@ -62,50 +63,78 @@ export function ScanFlow({ mode, onComplete, onBack }: ScanFlowProps) {
           console.error("❌ [ScanFlow] Failed to save photos to localStorage");
         }
       } else {
-        // NEW SCAN MODE: For authenticated users, save directly to database
-        if (user) {
-          console.log("🚀 [ScanFlow] New scan mode + authenticated user - saving directly to database");
-          
-          const saveDirectly = async () => {
+        // NEW SCAN MODE: Only save to database if user has PAID
+        const processScan = async () => {
+          if (user) {
+            // Check if user has paid before attempting upload
+            const hasPaid = await checkHasPaid();
+            
+            if (!hasPaid) {
+              // User is authenticated but NOT paid - save to localStorage and redirect to paywall
+              console.warn("🚫 [ScanFlow] User not paid - saving to localStorage, redirecting to paywall");
+              const saved = saveGuestPhotos({
+                frontPhotoBase64: frontPhoto,
+                sidePhotoBase64: sidePhoto,
+              });
+              
+              if (saved) {
+                console.log("✅ [ScanFlow] Photos saved to localStorage (waiting for payment)");
+              }
+              
+              setTimeout(() => {
+                navigate("/paywall");
+              }, 500);
+              return;
+            }
+            
+            // User has paid - proceed with saving to database
+            console.log("🚀 [ScanFlow] User paid - saving directly to database");
+            
             const result = await saveAuthenticatedScan(frontPhoto, sidePhoto);
             
             if (result.success) {
               console.log("✅ [ScanFlow] Scan saved successfully, redirecting to dashboard...");
-              // Redirect to dashboard to show new scan results
               setTimeout(() => {
                 navigate("/dashboard");
               }, 500);
             } else {
               console.error("❌ [ScanFlow] Failed to save scan:", result.error);
+              
+              // If blocked due to payment, redirect to paywall
+              if (result.error === "PAYMENT_REQUIRED") {
+                console.warn("🚫 [ScanFlow] Payment required - redirecting to paywall");
+                navigate("/paywall");
+                return;
+              }
+              
               alert(`Failed to save scan: ${result.error}`);
-              // Reset to allow retry
               setStep("front");
               setFrontPhoto(null);
               setSidePhoto(null);
             }
-          };
-          
-          saveDirectly();
-        } else {
-          // Unauthenticated user doing new scan - save to localStorage and redirect to paywall
-          console.log("🚀 [ScanFlow] New scan mode + unauthenticated user - redirecting to paywall");
-          const saved = saveGuestPhotos({
-            frontPhotoBase64: frontPhoto,
-            sidePhotoBase64: sidePhoto,
-          });
-
-          if (saved) {
-            console.log("✅ [ScanFlow] Photos saved to localStorage");
-            if (onComplete) {
-              onComplete();
-            }
-            setTimeout(() => {
-              navigate("/paywall");
-            }, 500);
           } else {
-            console.error("❌ [ScanFlow] Failed to save photos to localStorage");
+            // Unauthenticated user - save to localStorage and redirect to paywall
+            console.log("🚀 [ScanFlow] Unauthenticated user - saving to localStorage");
+            const saved = saveGuestPhotos({
+              frontPhotoBase64: frontPhoto,
+              sidePhotoBase64: sidePhoto,
+            });
+
+            if (saved) {
+              console.log("✅ [ScanFlow] Photos saved to localStorage");
+              if (onComplete) {
+                onComplete();
+              }
+              setTimeout(() => {
+                navigate("/paywall");
+              }, 500);
+            } else {
+              console.error("❌ [ScanFlow] Failed to save photos to localStorage");
+            }
           }
-        }
+        };
+        
+        processScan();
       }
     }
   }, [step, frontPhoto, sidePhoto, mode, user, onComplete, navigate]);

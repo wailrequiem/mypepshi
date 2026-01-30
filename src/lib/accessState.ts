@@ -90,3 +90,57 @@ export async function getAuthRedirectPath(userId: string): Promise<string> {
   const accessState = await getAccessState(userId);
   return getRedirectPath(accessState);
 }
+
+// =============================================================
+// Payment Gating Helpers
+// Used to block scan uploads/saves until payment is confirmed
+// =============================================================
+
+export interface PaidAccessResult {
+  allowed: boolean;
+  reason?: "NOT_AUTHENTICATED" | "PAYMENT_REQUIRED";
+  userId?: string;
+}
+
+/**
+ * Checks if the current user has paid and is allowed to upload scans.
+ * This is the SINGLE SOURCE OF TRUTH for scan upload gating.
+ * 
+ * @returns { allowed: boolean, reason?: string, userId?: string }
+ */
+export async function requirePaidAccess(): Promise<PaidAccessResult> {
+  try {
+    // 1. Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.warn("[requirePaidAccess] User not authenticated");
+      return { allowed: false, reason: "NOT_AUTHENTICATED" };
+    }
+
+    // 2. Check payment status
+    const subscription = await getSubscription();
+    const hasPaid = isPremiumActive(subscription);
+
+    if (!hasPaid) {
+      console.warn("[requirePaidAccess] User has not paid - blocking scan operation");
+      return { allowed: false, reason: "PAYMENT_REQUIRED", userId: user.id };
+    }
+
+    console.log("[requirePaidAccess] User has paid - scan operation allowed");
+    return { allowed: true, userId: user.id };
+  } catch (error) {
+    console.error("[requirePaidAccess] Error checking access:", error);
+    return { allowed: false, reason: "NOT_AUTHENTICATED" };
+  }
+}
+
+/**
+ * Simple boolean check for paid status (for UI gating)
+ * 
+ * @returns true if user has paid, false otherwise
+ */
+export async function checkHasPaid(): Promise<boolean> {
+  const result = await requirePaidAccess();
+  return result.allowed;
+}

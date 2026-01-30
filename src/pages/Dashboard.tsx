@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PaymentSuccessScreen } from "@/components/payment/PaymentSuccessScreen";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { getSignedUrl } from "@/lib/photoUpload";
 import { TabBar } from "@/components/navigation/TabBar";
 import { AnalysisTab } from "@/components/tabs/AnalysisTab";
 import { CoachTab } from "@/components/tabs/CoachTab";
+import { hasPendingScan } from "@/lib/pendingScan";
+import { flushPendingScanToSupabase } from "@/lib/flushPendingScan";
 
 interface Scan {
   id: string;
@@ -20,6 +22,7 @@ interface Scan {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, signOut } = useAuth();
   const [scanHistory, setScanHistory] = useState<Array<{ date: Date; score: number; id: string }>>([]);
   const [latestScan, setLatestScan] = useState<Scan | null>(null);
@@ -27,6 +30,47 @@ export default function Dashboard() {
   const [frontImageSignedUrl, setFrontImageSignedUrl] = useState<string | null>(null);
   const [sideImageSignedUrl, setSideImageSignedUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"analysis" | "coach">("analysis");
+  const [isFlushingPendingScan, setIsFlushingPendingScan] = useState(false);
+  const hasFlushedRef = useRef(false);
+
+  // Flush pending scan AFTER payment success
+  // This is the ONLY place where pending scans are uploaded to Supabase
+  useEffect(() => {
+    const flushAfterPayment = async () => {
+      const paymentStatus = searchParams.get("payment");
+      
+      // Only flush if payment was successful and we have pending scan
+      if (paymentStatus !== "success") return;
+      if (!user) return;
+      if (!hasPendingScan()) return;
+      if (hasFlushedRef.current) return;
+      
+      console.log("💳 [Dashboard] Payment success detected, flushing pending scan...");
+      hasFlushedRef.current = true;
+      setIsFlushingPendingScan(true);
+      
+      try {
+        const result = await flushPendingScanToSupabase();
+        
+        if (result.success) {
+          console.log("✅ [Dashboard] Pending scan flushed successfully:", result.scanId);
+          // Refresh scans to show the new one
+          await fetchScans();
+        } else {
+          console.error("❌ [Dashboard] Flush failed:", result.error);
+        }
+      } catch (error) {
+        console.error("❌ [Dashboard] Unexpected flush error:", error);
+      } finally {
+        setIsFlushingPendingScan(false);
+        // Clear the payment query param to prevent re-flush on refresh
+        searchParams.delete("payment");
+        setSearchParams(searchParams, { replace: true });
+      }
+    };
+    
+    flushAfterPayment();
+  }, [user, searchParams]);
 
   const fetchScans = async () => {
     if (!user) return;
@@ -131,6 +175,19 @@ export default function Dashboard() {
       setIsLoggingOut(false);
     }
   };
+
+  // Show loading screen while flushing pending scan after payment
+  if (isFlushingPendingScan) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+        <h2 className="text-2xl font-bold text-foreground mb-2">Processing your scan...</h2>
+        <p className="text-muted-foreground text-center max-w-sm">
+          We're analyzing your photos and preparing your personalized results.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
