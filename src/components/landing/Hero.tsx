@@ -72,34 +72,25 @@ export function Hero() {
 
         {/* Feature cards preview */}
         <div className="mt-20 grid gap-4 sm:grid-cols-3">
-          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto">
               <Scan className="h-6 w-6 text-primary" />
             </div>
             <h3 className="font-semibold" style={{ fontFamily: 'var(--font-display)' }}>Instant Analysis</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              AI scans your facial features in seconds for detailed insights.
-            </p>
           </div>
           
-          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto">
               <Sparkles className="h-6 w-6 text-primary" />
             </div>
             <h3 className="font-semibold" style={{ fontFamily: 'var(--font-display)' }}>Personalized Plan</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Get tailored recommendations based on your unique features.
-            </p>
           </div>
           
-          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+          <div className="group rounded-2xl border border-border bg-card/50 p-6 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto">
               <TrendingUp className="h-6 w-6 text-primary" />
             </div>
             <h3 className="font-semibold" style={{ fontFamily: 'var(--font-display)' }}>Track Progress</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Monitor your improvement journey with weekly check-ins.
-            </p>
           </div>
         </div>
       </div>
