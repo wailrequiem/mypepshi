@@ -25,6 +25,7 @@ export async function startTrialCheckout(options?: {
     }
 
     console.log("[Stripe] Starting trial checkout...");
+    console.log("[Stripe] Token present:", !!session.access_token, "Length:", session.access_token?.length);
 
     // Call Edge Function
     const response = await fetch(
@@ -34,6 +35,7 @@ export async function startTrialCheckout(options?: {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session.access_token}`,
+          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY || "",
         },
         body: JSON.stringify({
           success_url: options?.successUrl || `${window.location.origin}/dashboard?payment=success`,
@@ -42,7 +44,10 @@ export async function startTrialCheckout(options?: {
       }
     );
 
+    console.log("[Stripe] Response status:", response.status);
+    
     const data = await response.json();
+    console.log("[Stripe] Response data:", data);
 
     if (!response.ok || !data.ok) {
       console.error("[Stripe] Checkout error:", data);
