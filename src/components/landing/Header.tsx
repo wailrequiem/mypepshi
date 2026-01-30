@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { getAccessState, getRedirectPath, getAuthRedirectPath } from "@/lib/accessState";
 import logo from "@/assets/logo.png";
 
 export function Header() {
@@ -13,7 +13,7 @@ export function Header() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Check if user has paid (by checking if they have scans) and completed onboarding
+  // Check user access state when user changes
   useEffect(() => {
     const checkUserStatus = async () => {
       if (!user) {
@@ -23,23 +23,9 @@ export function Header() {
       }
 
       try {
-        // Check if user has scans (indicates payment)
-        const { data: scans } = await supabase
-          .from("scans")
-          .select("id")
-          .eq("user_id", user.id)
-          .limit(1);
-
-        setHasPaid(scans && scans.length > 0);
-
-        // Check if user completed onboarding
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("onboarding_json")
-          .eq("id", user.id)
-          .single();
-
-        setHasCompletedOnboarding(profile?.onboarding_json?.completed === true);
+        const accessState = await getAccessState(user.id);
+        setHasPaid(accessState.hasPaid);
+        setHasCompletedOnboarding(accessState.onboardingCompleted);
       } catch (error) {
         console.error("Error checking user status:", error);
       }
@@ -55,9 +41,27 @@ export function Header() {
     }
   };
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = async () => {
     setIsAuthModalOpen(false);
-    navigate('/dashboard');
+    
+    // Route based on state machine instead of hardcoded /dashboard
+    // Wait a moment for auth state to settle, then get the correct route
+    setTimeout(async () => {
+      try {
+        // Re-fetch user from auth context
+        const { data: { user: currentUser } } = await import("@/lib/supabase").then(m => m.supabase.auth.getUser());
+        
+        if (currentUser) {
+          const redirectPath = await getAuthRedirectPath(currentUser.id);
+          navigate(redirectPath);
+        } else {
+          navigate('/onboarding');
+        }
+      } catch (error) {
+        console.error("Error getting redirect path:", error);
+        navigate('/onboarding');
+      }
+    }, 100);
   };
 
   const handleUserButtonClick = () => {

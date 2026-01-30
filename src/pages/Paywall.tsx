@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PostOnboardingPaywall } from "@/components/paywall/PostOnboardingPaywall";
 import { useAuth } from "@/contexts/AuthContext";
 import { hasPendingScan } from "@/lib/pendingScan";
@@ -10,43 +10,43 @@ export default function Paywall() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isFlushing, setIsFlushing] = useState(false);
+  const hasFlushedRef = useRef(false);
 
-  // Auto-flush pending scan when user logs in/signs up
+  // Flush pending scan when user logs in/signs up (but don't auto-redirect)
   useEffect(() => {
-    const autoFlush = async () => {
+    const flushPendingScan = async () => {
       if (!user) return;
       if (!hasPendingScan()) return;
-      if (isFlushing) return;
+      if (isFlushing || hasFlushedRef.current) return;
 
-      console.log("🔄 [Paywall] User authenticated with pending scan, auto-flushing...");
+      console.log("🔄 [Paywall] User authenticated with pending scan, flushing...");
       setIsFlushing(true);
+      hasFlushedRef.current = true;
 
       try {
         const result = await flushPendingScanToSupabase();
         
         if (result.success) {
-          console.log("✅ [Paywall] Flush successful, redirecting to dashboard...");
-          // Redirect to dashboard after successful flush
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 1000);
+          console.log("✅ [Paywall] Flush successful");
+          // NOTE: Do NOT auto-redirect to dashboard here
+          // User must pay first - PaywallRoute guard will redirect after payment
         } else {
           console.error("❌ [Paywall] Flush failed:", result.error);
-          // Show error but still allow to continue
-          setIsFlushing(false);
         }
       } catch (error) {
         console.error("❌ [Paywall] Unexpected flush error:", error);
+      } finally {
         setIsFlushing(false);
       }
     };
 
-    autoFlush();
-  }, [user, navigate]);
+    flushPendingScan();
+  }, [user]);
 
   const handleUnlock = () => {
-    // Simple: redirect directly to dashboard
-    console.log("🚀 [Paywall] User clicked unlock, redirecting to dashboard");
+    // This is called after successful payment
+    // Navigate to dashboard - the ProtectedRoute will verify access
+    console.log("🚀 [Paywall] User unlocked, redirecting to dashboard");
     navigate("/dashboard");
   };
 

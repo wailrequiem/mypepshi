@@ -7,6 +7,8 @@ import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { PaywallRoute } from "@/components/auth/PaywallRoute";
+import { OnboardingRoute } from "@/components/auth/OnboardingRoute";
 import { PageTransition } from "@/components/layout/PageTransition";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
@@ -14,6 +16,7 @@ import Paywall from "./pages/Paywall";
 import Dashboard from "./pages/Dashboard";
 import NewScan from "./pages/NewScan";
 import ScanResults from "./pages/ScanResults";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,15 +33,24 @@ function AnimatedRoutes() {
             <Index />
           </PageTransition>
         } />
-        <Route path="/onboarding" element={
+        <Route path="/auth/callback" element={
           <PageTransition>
-            <Onboarding />
+            <AuthCallback />
           </PageTransition>
         } />
+        <Route path="/onboarding" element={
+          <OnboardingRoute>
+            <PageTransition>
+              <Onboarding />
+            </PageTransition>
+          </OnboardingRoute>
+        } />
         <Route path="/paywall" element={
-          <PageTransition>
-            <Paywall />
-          </PageTransition>
+          <PaywallRoute>
+            <PageTransition>
+              <Paywall />
+            </PageTransition>
+          </PaywallRoute>
         } />
         <Route path="/dashboard" element={
           <ProtectedRoute>
