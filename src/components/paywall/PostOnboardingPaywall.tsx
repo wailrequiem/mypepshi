@@ -7,6 +7,11 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { BeforeAfterReviewsCarousel } from "@/components/paywall/BeforeAfterReviewsCarousel";
 
+// Image imports (Vite asset handling)
+import paywallBefore from "@/assets/paywall-before.png";
+import paywallAfter from "@/assets/paywall-after.png";
+import glowupPlan from "@/assets/glowup-plan.png";
+
 interface PostOnboardingPaywallProps {
   onUnlock: () => void;
   gender?: "man" | "woman" | null;
@@ -109,7 +114,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
           <div className="relative flex-1 max-w-[140px]">
             <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-surface border border-border">
               <img 
-                src="/src/assets/paywall-before.png"
+                src={paywallBefore}
                 alt="Before transformation"
                 className="w-full h-full object-cover"
                 style={{ filter: "brightness(0.85) saturate(0.8)" }}
@@ -136,7 +141,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
           <div className="relative flex-1 max-w-[140px]">
             <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-surface border-2 border-primary/60 glow-accent">
               <img 
-                src="/src/assets/paywall-after.png"
+                src={paywallAfter}
                 alt="After transformation"
                 className="w-full h-full object-cover"
               />
@@ -328,7 +333,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
             style={{ filter: "blur(3px)" }}
           >
             <img 
-              src="/src/assets/glowup-plan.png"
+              src={glowupPlan}
               alt="Glow-up plan preview"
               className="w-full rounded-lg"
             />

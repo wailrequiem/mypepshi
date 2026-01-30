@@ -2,6 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 
+// Image imports (Vite asset handling)
+import reviewMarcus from "@/assets/review-marcus.png";
+import reviewAlex from "@/assets/review-alex.png";
+import reviewJordan from "@/assets/review-jordan.png";
+
 interface Review {
   id: string;
   beforeSrc: string;
@@ -16,8 +21,8 @@ interface Review {
 const reviews: Review[] = [
   {
     id: "1",
-    beforeSrc: "/src/assets/review-marcus.png",
-    afterSrc: "/src/assets/review-marcus.png",
+    beforeSrc: reviewMarcus,
+    afterSrc: reviewMarcus,
     rating: 5,
     usedMonths: 3,
     text: "My skin cleared up completely and my jawline is way more defined. People keep asking what I changed. This literally transformed how I see myself.",
@@ -26,8 +31,8 @@ const reviews: Review[] = [
   },
   {
     id: "2",
-    beforeSrc: "/src/assets/review-alex.png",
-    afterSrc: "/src/assets/review-alex.png",
+    beforeSrc: reviewAlex,
+    afterSrc: reviewAlex,
     rating: 5,
     usedMonths: 2,
     text: "I was skeptical at first but the results speak for themselves. Lost face fat, better skin texture, and way more confidence. Best decision I made this year.",
@@ -36,8 +41,8 @@ const reviews: Review[] = [
   },
   {
     id: "3",
-    beforeSrc: "/src/assets/review-jordan.png",
-    afterSrc: "/src/assets/review-jordan.png",
+    beforeSrc: reviewJordan,
+    afterSrc: reviewJordan,
     rating: 5,
     usedMonths: 4,
     text: "The acne that plagued me for years is finally gone. My face structure looks sharper and I actually like taking photos now. Life-changing honestly.",

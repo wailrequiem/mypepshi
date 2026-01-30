@@ -3,6 +3,9 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { OnboardingHeader } from "../OnboardingHeader";
 
+// Image imports (Vite asset handling)
+import testimonialBeforeAfter from "@/assets/testimonial-before-after.png";
+
 interface MessageScreenProps {
   badge?: string;
   title: string;
@@ -25,7 +28,7 @@ const TESTIMONIAL_DATA = {
   review: "I was skeptical at first, but the personalized approach completely changed how I look and feel. The results speak for themselves.",
   author: "Mark, 23",
   timeframe: "8 weeks progress",
-  combinedImage: "/src/assets/testimonial-before-after.png", // Single before/after image
+  combinedImage: testimonialBeforeAfter,
 };
 
 export function MessageScreen({ 
