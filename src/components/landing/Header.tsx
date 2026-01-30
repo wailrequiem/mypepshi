@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAccessState, getRedirectPath, getAuthRedirectPath } from "@/lib/accessState";
+import { Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -39,6 +41,7 @@ export function Header() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+    setIsMobileMenuOpen(false);
   };
 
   const handleAuthSuccess = async () => {
@@ -77,11 +80,20 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Mobile menu button - left side */}
+        <button
+          className="md:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+
         <Link to="/" className="flex items-center">
           <img 
             src={logo} 
             alt="MyPepMaxx" 
-            className="h-12 w-auto object-contain"
+            className="h-14 sm:h-16 w-auto object-contain"
           />
         </Link>
         
@@ -105,7 +117,7 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="hidden sm:inline-flex"
+              className="hidden md:inline-flex"
               onClick={handleUserButtonClick}
             >
               {hasPaid ? "Dashboard" : hasCompletedOnboarding ? "Unlock Now" : "Continue"}
@@ -114,19 +126,84 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="hidden sm:inline-flex"
+              className="hidden md:inline-flex"
               onClick={() => setIsAuthModalOpen(true)}
             >
               Log in
             </Button>
           )}
-          <Link to="/onboarding">
+          <Link to="/onboarding" className="hidden sm:block">
             <Button size="sm">
-              Get Started
+              Start My Glow-Up
             </Button>
           </Link>
         </div>
       </div>
+
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
+          <nav className="flex flex-col px-4 py-4 space-y-1">
+            <button 
+              onClick={() => scrollToSection('features')} 
+              className="text-left px-3 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent rounded-lg"
+            >
+              Features
+            </button>
+            <button 
+              onClick={() => scrollToSection('how-it-works')} 
+              className="text-left px-3 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent rounded-lg"
+            >
+              How It Works
+            </button>
+            <button 
+              onClick={() => scrollToSection('testimonials')} 
+              className="text-left px-3 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent rounded-lg"
+            >
+              Testimonials
+            </button>
+            <button 
+              onClick={() => scrollToSection('faq')} 
+              className="text-left px-3 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent rounded-lg"
+            >
+              FAQ
+            </button>
+            
+            <div className="border-t border-border/50 pt-3 mt-2 space-y-2">
+              {user ? (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    handleUserButtonClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  {hasPaid ? "Dashboard" : hasCompletedOnboarding ? "Unlock Now" : "Continue"}
+                </Button>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setIsAuthModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Log in
+                </Button>
+              )}
+              <Link to="/onboarding" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button size="sm" className="w-full">
+                  Start My Glow-Up
+                </Button>
+              </Link>
+            </div>
+          </nav>
+        </div>
+      )}
 
       <AuthModal 
         isOpen={isAuthModalOpen}

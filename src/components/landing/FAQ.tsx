@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -39,7 +39,7 @@ export function FAQ() {
       <div className="mx-auto max-w-3xl">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <HelpCircle className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">FAQ</span>
           </div>
           <h2 

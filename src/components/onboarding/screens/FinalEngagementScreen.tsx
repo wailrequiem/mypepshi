@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Zap } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { OnboardingHeader } from "../OnboardingHeader";
@@ -39,7 +39,7 @@ export function FinalEngagementScreen({ onNext, totalSteps, currentStep, onBack 
           />
           
           <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 flex items-center justify-center">
-            <Sparkles className="w-14 h-14 text-primary" />
+            <Zap className="w-14 h-14 text-primary" />
           </div>
         </motion.div>
 
@@ -68,7 +68,7 @@ export function FinalEngagementScreen({ onNext, totalSteps, currentStep, onBack 
           console.log("🔘 [FinalEngagementScreen] Button clicked!");
           onNext();
         }}>
-          <Sparkles className="w-5 h-5" />
+          <Zap className="w-5 h-5" />
           Yes, show me my analysis
         </PrimaryButton>
       </motion.div>

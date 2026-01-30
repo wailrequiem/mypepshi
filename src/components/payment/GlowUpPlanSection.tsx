@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Target, Lock, Check, Sparkles, Loader2 } from "lucide-react";
+import { Target, Lock, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { GlowUpDayTasksModal } from "./GlowUpDayTasksModal";

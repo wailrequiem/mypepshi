@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, Plus, Sparkles, Calendar, FlaskConical, Loader2 } from "lucide-react";
+import { Eye, Plus, CircleDashed, Calendar, FlaskConical, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { GlowUpPlanSection } from "./GlowUpPlanSection";
@@ -340,7 +340,7 @@ export const PaymentSuccessScreen = ({
                   ) : (
                     <div className="w-full aspect-square flex flex-col items-center justify-center gap-3 p-4">
                       <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center">
-                        <Sparkles className="w-8 h-8 text-muted-foreground" />
+                        <CircleDashed className="w-8 h-8 text-muted-foreground" />
                       </div>
                       <p className="text-sm text-muted-foreground">{label}</p>
                     </div>

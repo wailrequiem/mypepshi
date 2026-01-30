@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function CTA() {
@@ -13,38 +13,39 @@ export function CTA() {
       <div className="relative mx-auto max-w-4xl">
         <div className="rounded-3xl border border-primary/20 bg-card/50 p-8 text-center backdrop-blur-sm sm:p-12 lg:p-16">
           <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-            <Sparkles className="h-8 w-8 text-primary" />
+            <Rocket className="h-8 w-8 text-primary" />
           </div>
           
           <h2 
             className="text-3xl font-bold tracking-tight sm:text-4xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Ready to Unlock Your{" "}
-            <span className="text-primary">Potential?</span>
+            Ready to See{" "}
+            <span className="text-primary">Your Best Self?</span>
           </h2>
           
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground text-balance">
-            Join thousands who have transformed their appearance with personalized, 
-            AI-powered insights. Your first analysis is completely free.
+            Join thousands who have started their transformation journey. 
+            Your personalized glow-up plan is just one scan away.
           </p>
           
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to="/onboarding" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full">
-                Get Your Analysis Now
+              <Button size="lg" className="w-full text-base py-6">
+                Start My Glow-Up
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link to="/paywall" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="w-full bg-transparent">
-                View Pricing
-              </Button>
-            </Link>
+            <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent" onClick={() => {
+              const element = document.getElementById('how-it-works');
+              if (element) element.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              See How It Works
+            </Button>
           </div>
           
           <p className="mt-6 text-sm text-muted-foreground">
-            No credit card required. Free forever tier available.
+            Takes 60 seconds · No commitment required
           </p>
         </div>
       </div>

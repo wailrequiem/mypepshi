@@ -1,44 +1,44 @@
-import { Quote, Sparkles, Star } from "lucide-react";
+import { Quote, Trophy, Star } from "lucide-react";
 import marcusBeforeAfter from "@/assets/testimonial-marcus-before-after.jpg";
 import sarahBeforeAfter from "@/assets/testimonial-sarah-before-after.png";
 
 const testimonials = [
   {
     name: "Alex M.",
-    role: "Software Engineer",
-    content: "I didn't expect an app to be this precise. The scan highlighted details I'd never noticed, and the advice actually helped me adjust my grooming routine.",
+    role: "26, London",
+    content: "I didn't expect it to be this accurate. The scan highlighted things I'd never noticed, and the tips actually helped me improve my grooming routine.",
     rating: 5,
   },
   {
     name: "Daniel K.",
-    role: "Entrepreneur",
-    content: "The masculinity score and feature breakdown made me see my face differently. It's not about changing who you are, just enhancing what's already there.",
+    role: "24, New York",
+    content: "Seeing my face broken down like that was eye-opening. It's not about changing who you are — just enhancing what's already there.",
     rating: 5,
   },
   {
     name: "Marcus R.",
-    role: "Fitness Coach",
-    content: "I loved how the app gave me practical, easy-to-follow tasks. It feels like a coach that knows my face better than I do.",
+    role: "28, Miami",
+    content: "The weekly tasks made it easy to stay consistent. It feels like having a coach who actually understands my face.",
     rating: 5,
     image: marcusBeforeAfter,
   },
   {
     name: "Sarah L.",
-    role: "Student",
-    content: "Honestly, I didn't expect much… but the scan felt incredibly precise. The feedback was clear, personalized, and easy to apply.",
+    role: "22, Toronto",
+    content: "I was skeptical at first… but the feedback was incredibly precise and easy to follow. I'm already seeing small changes.",
     rating: 5,
     image: sarahBeforeAfter,
   },
   {
     name: "Oliver P.",
-    role: "Designer",
-    content: "What impressed me most was how tailored the recommendations felt. It wasn't generic skincare tips — it was specific to my features.",
+    role: "27, Berlin",
+    content: "What impressed me was how personal it felt. Not generic tips — recommendations specific to my actual features.",
     rating: 5,
   },
   {
     name: "William T.",
-    role: "Marketing Manager",
-    content: "It's like having a personal style assistant in your pocket. You scan, you learn, and you evolve — it's that simple.",
+    role: "25, Sydney",
+    content: "It's like having a personal appearance coach in your pocket. Scan, learn, improve — that simple.",
     rating: 5,
   },
 ];
@@ -49,18 +49,18 @@ export function Testimonials() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground">Testimonials</span>
+            <Trophy className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground">Real Results</span>
           </div>
           <h2 
             className="text-3xl font-bold tracking-tight sm:text-4xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            What Users Are{" "}
-            <span className="text-primary">Saying</span>
+            People Like You Are{" "}
+            <span className="text-primary">Transforming</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground text-balance">
-            Trusted by thousands looking to understand and improve their appearance.
+            Real stories from real people who started their glow-up journey.
           </p>
         </div>
 

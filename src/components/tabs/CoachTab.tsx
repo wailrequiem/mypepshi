@@ -10,7 +10,7 @@ import {
 } from "@/lib/coach";
 import { 
   Dumbbell, 
-  Sparkles, 
+  Droplets, 
   FlaskConical, 
   Target, 
   Zap,
@@ -22,7 +22,7 @@ import {
 const prompts = [
   { icon: <Target className="w-6 h-6 text-primary" />, title: "Improve your jawline" },
   { icon: <Dumbbell className="w-6 h-6 text-primary" />, title: "Gain more muscle" },
-  { icon: <Sparkles className="w-6 h-6 text-primary" />, title: "Improve skin quality" },
+  { icon: <Droplets className="w-6 h-6 text-primary" />, title: "Improve skin quality" },
   { icon: <FlaskConical className="w-6 h-6 text-primary" />, title: "Learn about peptides" },
   { icon: <Target className="w-6 h-6 text-primary" />, title: "Best peptides for my goals" },
   { icon: <Zap className="w-6 h-6 text-primary" />, title: "Optimize recovery & performance" },

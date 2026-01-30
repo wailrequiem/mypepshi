@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { X, ChevronRight, Pill, Lock, Sparkles, Zap, Moon, Dumbbell, Droplets, Heart } from "lucide-react";
+import { X, ChevronRight, Pill, Lock, Zap, Moon, Dumbbell, Droplets, Heart } from "lucide-react";
 
 interface PeptidesFlowProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ interface GoalOption {
 }
 
 const goalOptions: GoalOption[] = [
-  { id: "skin", label: "Improve skin quality", icon: Sparkles },
+  { id: "skin", label: "Improve skin quality", icon: Droplets },
   { id: "lean", label: "Get leaner / dry out", icon: Droplets },
   { id: "muscle", label: "Build more muscle", icon: Dumbbell },
   { id: "recovery", label: "Improve recovery", icon: Zap },

@@ -5,7 +5,7 @@
 
 import { ReactNode } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
-import { Loader2, Lock, Sparkles } from "lucide-react";
+import { Loader2, Lock, Clock } from "lucide-react";
 
 interface SubscriptionGateProps {
   children: ReactNode;
@@ -85,7 +85,7 @@ function TrialBadge({ daysRemaining }: { daysRemaining: number }) {
   return (
     <div className="absolute top-2 right-2 z-10">
       <div className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <Clock className="w-3.5 h-3.5 text-primary" />
         <span className="text-xs font-medium text-primary">
           Trial: {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
         </span>

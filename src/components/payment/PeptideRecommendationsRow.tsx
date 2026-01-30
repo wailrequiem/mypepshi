@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FlaskConical, X, Sparkles, Lightbulb, Shield, Clock, AlertTriangle } from "lucide-react";
+import { FlaskConical, X, Info, Lightbulb, Shield, Clock, AlertTriangle, Check, Brain } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { explainPeptide, type PeptideExplanation } from "@/lib/peptides/explainPeptide";
@@ -225,7 +225,7 @@ export const PeptideRecommendationsRow = ({
 
                   {/* Hover indicator */}
                   <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Sparkles className="w-3 h-3" />
+                    <Info className="w-3 h-3" />
                     <span>Click for details</span>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export const PeptideRecommendationsRow = ({
 
                     {/* Tap indicator */}
                     <div className="flex items-center gap-1 text-xs text-primary">
-                      <Sparkles className="w-3 h-3" />
+                      <Info className="w-3 h-3" />
                       <span>Tap for details</span>
                     </div>
                   </div>
@@ -372,7 +372,7 @@ export const PeptideRecommendationsRow = ({
                     <ul className="space-y-2">
                       {selectedPeptide.benefits.map((benefit, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                          <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                           <span>{benefit}</span>
                         </li>
                       ))}
@@ -383,7 +383,7 @@ export const PeptideRecommendationsRow = ({
                 {/* AI Explanation Section */}
                 <div className="space-y-4 border-t border-border pt-6">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
+                    <Brain className="w-5 h-5 text-primary" />
                     <h3 className="text-lg font-semibold text-foreground">
                       AI Explanation
                     </h3>

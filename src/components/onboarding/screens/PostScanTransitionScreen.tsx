@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { OnboardingHeader } from "../OnboardingHeader";
@@ -41,7 +41,7 @@ export function PostScanTransitionScreen({ onNext, totalSteps, currentStep, onBa
               }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <Sparkles className="w-16 h-16 text-primary" />
+              <CheckCircle className="w-16 h-16 text-primary" />
             </motion.div>
           </div>
 

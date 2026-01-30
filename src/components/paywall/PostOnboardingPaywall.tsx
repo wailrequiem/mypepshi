@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Shield, Lock, Check, Users, Clock, Star, ChevronLeft, Mail, Sparkles, Loader2 } from "lucide-react";
+import { ChevronRight, Shield, Lock, Check, Users, Clock, Star, ChevronLeft, Mail, ArrowUp, Loader2, Zap } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { LockedPeptideCoachSection } from "@/components/payment/LockedPeptideCoachSection";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -37,6 +37,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -88,12 +89,12 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
   const plans = [
     { 
       id: "trial", 
-      name: "Start with 3-day trial", 
+      name: "3-Day Full Access Trial", 
       price: "$1", 
-      originalPrice: "", 
-      perDay: "then $29/month", 
+      originalPrice: "$9", 
+      perDay: "", 
       highlight: true, 
-      badge: "BEST VALUE",
+      badge: "🔥 LIMITED OFFER",
       description: "Try full premium access for just $1"
     },
   ];
@@ -142,7 +143,8 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        transition={{ delay: 0.4 }}
+        className="mb-8 mt-12"
       >
         <div className="flex items-center justify-center gap-2">
           {/* Before Image */}
@@ -181,7 +183,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
                 className="w-full h-full object-cover"
               />
               <div className="absolute bottom-2 right-2">
-                <Sparkles className="w-4 h-4 text-primary animate-pulse drop-shadow-lg" />
+                <ArrowUp className="w-4 h-4 text-primary animate-pulse drop-shadow-lg" />
               </div>
             </div>
             <div className="text-center mt-2">
@@ -247,119 +249,120 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
         </motion.div>
       </motion.div>
 
-      {/* Pricing Section */}
+      {/* Pricing Section - Highlighted Card */}
       <motion.div
         ref={pricingSectionRef}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="mb-6"
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.4, type: "spring", stiffness: 300, damping: 25 }}
+        className="mb-8 mt-4 relative"
       >
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Clock className="w-4 h-4 text-accent" />
-          <span className="text-xs text-accent font-semibold uppercase tracking-wide">Limited-time offer</span>
-        </div>
-        <h2 className="text-lg font-semibold text-foreground text-center mb-4">
-          Get Started with Special Pricing
-        </h2>
-        <div className="space-y-3">
-          {plans.map((plan, index) => (
-            <motion.button
-              key={plan.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              onClick={() => setSelectedPlan(plan.id)}
-              className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all relative ${
-                selectedPlan === plan.id
-                  ? "bg-primary/20 border-2 border-primary"
-                  : "glass border border-border"
-              } ${plan.highlight ? "ring-1 ring-primary/50" : ""}`}
-            >
-              {plan.badge && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary rounded-full">
-                  <span className="text-[10px] font-bold text-primary-foreground tracking-wide">{plan.badge}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    selectedPlan === plan.id
-                      ? "border-primary bg-primary"
-                      : "border-muted-foreground"
-                  }`}
-                >
-                  {selectedPlan === plan.id && (
-                    <Check className="w-3 h-3 text-primary-foreground" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-foreground">{plan.name}</p>
-                  {plan.perDay && (
-                    <span className="text-[11px] text-muted-foreground">{plan.perDay}</span>
-                  )}
-                </div>
+        {/* Glow effect behind the card */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent rounded-3xl blur-lg opacity-40 animate-pulse" />
+        
+        {/* Main card */}
+        <div className="relative bg-gradient-to-b from-surface-elevated to-background rounded-2xl border-2 border-accent/50 p-6 shadow-2xl shadow-accent/20">
+          {/* Top badge */}
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+            <div className="bg-gradient-to-r from-accent to-primary px-5 py-1.5 rounded-full shadow-lg">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-white" />
+                <span className="text-xs font-bold text-white uppercase tracking-wide">Exclusive Launch Offer</span>
               </div>
-              <div className="text-right">
-                <span className="text-xs text-muted-foreground line-through mr-1.5">{plan.originalPrice}</span>
-                <span className="text-lg font-bold text-foreground">{plan.price}</span>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
+            </div>
+          </div>
 
-      {/* Guarantee */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="flex items-center justify-center gap-2 mb-5"
-      >
-        <Shield className="w-5 h-5 text-primary" />
-        <p className="text-sm font-bold text-foreground underline underline-offset-2">
-          30-day money-back guarantee
-        </p>
-      </motion.div>
+          {/* Title */}
+          <h2 className="text-2xl font-bold text-foreground text-center mt-4 mb-6">
+            Get Started for Just <span className="text-accent">$1</span>
+          </h2>
 
-      {/* Subscribe CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="mb-8"
-      >
-        <button 
-          onClick={handleGlowUpNow}
-          disabled={isCheckoutLoading}
-          className="w-full py-4 px-6 rounded-2xl bg-accent text-accent-foreground font-bold text-base shadow-lg shadow-accent/30 hover:shadow-accent/50 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {isCheckoutLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Processing...
-            </>
-          ) : user ? (
-            "Start Trial for $1"
-          ) : (
-            "Create Account to Continue"
+          {/* Plan card */}
+          <div className="space-y-3 mb-6">
+            {plans.map((plan, index) => (
+              <motion.button
+                key={plan.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+                onClick={() => setSelectedPlan(plan.id)}
+                className={`w-full p-4 rounded-xl flex items-center justify-between transition-all relative ${
+                  selectedPlan === plan.id
+                    ? "bg-accent/20 border-2 border-accent"
+                    : "bg-muted/30 border border-border"
+                }`}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-accent rounded-full">
+                    <span className="text-[10px] font-bold text-accent-foreground tracking-wide">{plan.badge}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedPlan === plan.id
+                        ? "border-accent bg-accent"
+                        : "border-muted-foreground"
+                    }`}
+                  >
+                    {selectedPlan === plan.id && (
+                      <Check className="w-3 h-3 text-accent-foreground" />
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-foreground">{plan.name}</p>
+                  </div>
+                </div>
+                <div className="text-right flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground line-through">{plan.originalPrice}</span>
+                  <span className="text-2xl font-bold text-accent">{plan.price}</span>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Guarantee */}
+          <div className="flex items-center justify-center gap-2 mb-5 bg-primary/10 rounded-lg py-2">
+            <Shield className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold text-primary">
+              30-day money-back guarantee
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <button 
+            onClick={handleGlowUpNow}
+            disabled={isCheckoutLoading}
+            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-accent to-primary text-white font-bold text-lg shadow-lg shadow-accent/40 hover:shadow-accent/60 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isCheckoutLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing...
+              </>
+            ) : user ? (
+              "Start Trial for $1"
+            ) : (
+              "Create Account to Continue"
+            )}
+          </button>
+          
+          {!user && (
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              Sign up to unlock your personalized plan
+            </p>
           )}
-        </button>
-        {!user && (
-          <p className="text-center text-xs text-muted-foreground mt-2">
-            Sign up to unlock your personalized plan
-          </p>
-        )}
-        {user && (
-          <p className="text-center text-xs text-muted-foreground mt-2">
-            3 days full access, then $29/month. Cancel anytime.
-          </p>
-        )}
-        {checkoutError && (
-          <p className="text-center text-xs text-red-500 mt-2">
-            {checkoutError}
-          </p>
-        )}
+          {user && (
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              3 days full access. Cancel anytime.
+            </p>
+          )}
+          {checkoutError && (
+            <p className="text-center text-xs text-red-500 mt-2">
+              {checkoutError}
+            </p>
+          )}
+        </div>
       </motion.div>
 
       {/* Locked Results Preview - Glow-Up Plan */}
@@ -577,7 +580,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
             <strong>Today:</strong> Pay $1 for instant access to all premium features for 3 days.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-            <strong>After 3 days:</strong> Your subscription automatically renews at $29/month unless cancelled.
+            <strong>After 3 days:</strong> Your subscription automatically renews unless cancelled.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
             You can cancel anytime from your account settings or by contacting support - no questions asked.
@@ -648,9 +651,9 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
               </div>
               <button
                 onClick={scrollToPricing}
-                className="py-3 px-6 rounded-xl bg-accent text-accent-foreground font-bold text-sm shadow-lg shadow-accent/30 hover:shadow-accent/50 transition-all active:scale-[0.98]"
+                className="py-3 px-6 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-sm shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all active:scale-[0.98]"
               >
-                Get the offer
+                Claim $1 Trial
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, TrendingUp, Target, Calendar, Check } from "lucide-react";
+import { X, Flame, TrendingUp, Target, Calendar, Check } from "lucide-react";
 
 interface GlowUpPaywallProps {
   isOpen: boolean;
@@ -25,7 +25,7 @@ export function GlowUpPaywall({ isOpen, onClose, gender }: GlowUpPaywallProps) {
       description: "Step-by-step recommendations for optimal results",
     },
     {
-      icon: Sparkles,
+      icon: Target,
       title: "Goal-Based Optimization",
       description: "Tailored to your personal improvement goals",
     },
@@ -85,7 +85,7 @@ export function GlowUpPaywall({ isOpen, onClose, gender }: GlowUpPaywallProps) {
                 transition={{ delay: 0.2 }}
                 className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mx-auto mb-4"
               >
-                <Sparkles className="w-8 h-8 text-primary-foreground" />
+                <Flame className="w-8 h-8 text-primary-foreground" />
               </motion.div>
               <h1 className="text-2xl font-bold text-foreground mb-2">
                 Unlock Your Glow Up

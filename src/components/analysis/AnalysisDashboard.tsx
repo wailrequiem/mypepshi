@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Sparkles, Pill } from "lucide-react";
+import { Flame, Pill } from "lucide-react";
 import malePrototype from "@/assets/male-prototype.jpg";
 import femalePrototype from "@/assets/female-prototype.jpg";
 
@@ -237,7 +237,7 @@ export function AnalysisDashboard({ data, gender, onGlowUpClick, onPeptidesClick
           onClick={onGlowUpClick}
           className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-primary text-primary-foreground font-medium text-sm transition-all"
         >
-          <Sparkles className="w-4 h-4" />
+          <Flame className="w-4 h-4" />
           Glow Up Routine
         </motion.button>
         

@@ -1,4 +1,4 @@
-import { Camera, BarChart3, Lightbulb, Sparkles } from "lucide-react";
+import { Camera, BarChart3, Lightbulb, TrendingUp, Zap } from "lucide-react";
 import { useState } from "react";
 import step1_a from "@/assets/how-it-works/step1_a.jpg";
 import step1_b from "@/assets/how-it-works/step1_b.jpg";
@@ -10,29 +10,29 @@ const steps = [
   {
     number: "01",
     icon: Camera,
-    title: "Upload Your Photo",
-    description: "Take a clear, front-facing photo with neutral lighting. Our AI handles the rest.",
+    title: "Take a Quick Scan",
+    description: "Snap a clear photo. That's all we need to analyze your unique facial features.",
     images: [step1_a, step1_b],
   },
   {
     number: "02",
     icon: BarChart3,
-    title: "Get Your Analysis",
-    description: "Receive a detailed breakdown of your facial features, symmetry, and potential improvements.",
+    title: "See What to Improve",
+    description: "Get a clear breakdown of your strengths and the areas holding you back.",
     image: step2,
   },
   {
     number: "03",
     icon: Lightbulb,
     title: "Follow Your Plan",
-    description: "Get personalized recommendations and weekly tasks tailored to your unique profile.",
+    description: "Receive personalized weekly actions tailored specifically to your face and goals.",
     image: step3,
   },
   {
     number: "04",
-    icon: Sparkles,
-    title: "Track Your Progress",
-    description: "Monitor your transformation journey and see measurable improvements over time.",
+    icon: TrendingUp,
+    title: "Watch Yourself Transform",
+    description: "Track your progress and see real improvements over time. This is your glow-up.",
     image: step4,
   },
 ];
@@ -111,18 +111,18 @@ export function HowItWorks() {
       <div className="relative mx-auto max-w-7xl">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <Zap className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">How It Works</span>
           </div>
           <h2 
             className="text-3xl font-bold tracking-tight sm:text-4xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Simple Steps to{" "}
-            <span className="text-primary">Transform</span>
+            Your Glow-Up in{" "}
+            <span className="text-primary">4 Simple Steps</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground text-balance">
-            Get started in minutes and begin your optimization journey today.
+            Start in under a minute. See results within weeks.
           </p>
         </div>
 

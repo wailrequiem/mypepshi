@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles, TrendingUp } from "lucide-react";
+import { CircleDashed, TrendingUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -124,7 +124,7 @@ export function NewScanResultsScreen({ scores, onContinue }: NewScanResultsScree
               className="bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 aspect-square flex flex-col items-center justify-center gap-2"
             >
               <div className="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-muted-foreground" />
+                <CircleDashed className="w-6 h-6 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">{label}</p>
             </div>
