@@ -207,7 +207,8 @@ export async function redirectToCustomerPortal(options?: {
       return { error: "Please sign in to continue" };
     }
 
-    console.log("[Stripe] Creating customer portal session...");
+    console.log("[Stripe] Opening customer portal...");
+    console.log("[Stripe] Token length:", session.access_token?.length);
 
     // Call Edge Function to create portal session
     const response = await fetch(

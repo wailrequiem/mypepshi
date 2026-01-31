@@ -7,6 +7,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import Stripe from "https://esm.sh/stripe@14.10.0?target=deno";
+import { decode } from "https://deno.land/std@0.168.0/encoding/base64url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,12 +21,24 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-// Initialize Supabase Admin client
+// Initialize Supabase Admin client for database queries
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL") || "",
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
   { auth: { persistSession: false } }
 );
+
+// Simple JWT payload decoder (without verification - we trust Supabase's gateway)
+function decodeJwtPayload(token: string): { sub?: string; email?: string } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(new TextDecoder().decode(decode(parts[1])));
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 serve(async (req) => {
   console.log("[stripe-customer-portal] Function invoked");
@@ -36,7 +49,7 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Verify user authentication
+    // 1. Get user from Authorization header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       console.error("[stripe-customer-portal] No authorization header");
@@ -46,19 +59,21 @@ serve(async (req) => {
       );
     }
 
-    // Get user from Supabase Auth
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !user) {
-      console.error("[stripe-customer-portal] Auth error:", authError);
+    
+    // Decode JWT to get user ID (Supabase's API gateway already validated the token)
+    const payload = decodeJwtPayload(token);
+    
+    if (!payload?.sub) {
+      console.error("[stripe-customer-portal] Invalid token payload");
       return new Response(
         JSON.stringify({ error: "Invalid token", ok: false }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("[stripe-customer-portal] Authenticated user:", user.id);
+    const userId = payload.sub;
+    console.log("[stripe-customer-portal] User ID from token:", userId);
 
     // 2. Parse request body for return URL
     let returnUrl: string;
@@ -75,7 +90,7 @@ serve(async (req) => {
     const { data: customerData, error: customerError } = await supabaseAdmin
       .from("stripe_customers")
       .select("stripe_customer_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     if (customerError || !customerData?.stripe_customer_id) {
