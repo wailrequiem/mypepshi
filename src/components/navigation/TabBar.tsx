@@ -1,15 +1,19 @@
 import { motion } from "framer-motion";
-import { Scan, MessageCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Scan, MessageCircle, Settings } from "lucide-react";
 
 interface TabBarProps {
-  activeTab: "analysis" | "coach";
+  activeTab: "analysis" | "coach" | "settings";
   onTabChange: (tab: "analysis" | "coach") => void;
 }
 
 export function TabBar({ activeTab, onTabChange }: TabBarProps) {
+  const navigate = useNavigate();
+  
   const tabs = [
     { id: "analysis" as const, label: "Analysis", icon: Scan },
     { id: "coach" as const, label: "Coach", icon: MessageCircle },
+    { id: "settings" as const, label: "Settings", icon: Settings },
   ];
 
   return (
@@ -19,10 +23,18 @@ export function TabBar({ activeTab, onTabChange }: TabBarProps) {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
 
+          const handleClick = () => {
+            if (tab.id === "settings") {
+              navigate("/dashboard/settings");
+            } else {
+              onTabChange(tab.id);
+            }
+          };
+
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={handleClick}
               className="flex flex-col items-center gap-1 px-6 py-2 relative"
             >
               {isActive && (

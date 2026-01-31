@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAccessState, getRedirectPath, getAuthRedirectPath } from "@/lib/accessState";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function Header() {
@@ -12,7 +12,7 @@ export function Header() {
   const [hasPaid, setHasPaid] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   // Check user access state when user changes
@@ -74,6 +74,16 @@ export function Header() {
       navigate('/paywall');
     } else {
       navigate('/onboarding');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsMobileMenuOpen(false);
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 
@@ -171,17 +181,28 @@ export function Header() {
             
             <div className="border-t border-border/50 pt-3 mt-2 space-y-2">
               {user ? (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    handleUserButtonClick();
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  {hasPaid ? "Dashboard" : hasCompletedOnboarding ? "Unlock Now" : "Continue"}
-                </Button>
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      handleUserButtonClick();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    {hasPaid ? "Dashboard" : hasCompletedOnboarding ? "Unlock Now" : "Continue"}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log Out
+                  </Button>
+                </>
               ) : (
                 <Button 
                   variant="ghost" 

@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { PaymentSuccessScreen } from "@/components/payment/PaymentSuccessScreen";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { LogOut, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { getSignedUrl } from "@/lib/photoUpload";
+import { AppHeader } from "@/components/layout/AppHeader";
 import { TabBar } from "@/components/navigation/TabBar";
 import { AnalysisTab } from "@/components/tabs/AnalysisTab";
 import { CoachTab } from "@/components/tabs/CoachTab";
@@ -23,10 +23,9 @@ interface Scan {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [scanHistory, setScanHistory] = useState<Array<{ date: Date; score: number; id: string }>>([]);
   const [latestScan, setLatestScan] = useState<Scan | null>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [frontImageSignedUrl, setFrontImageSignedUrl] = useState<string | null>(null);
   const [sideImageSignedUrl, setSideImageSignedUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"analysis" | "coach">("analysis");
@@ -155,27 +154,6 @@ export default function Dashboard() {
     navigate(`/scan/${scanId}`);
   };
 
-  const handleLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      console.log("🔓 [Dashboard] Logging out user...");
-      
-      // Clear local storage onboarding data if needed
-      localStorage.removeItem("onboarding_data");
-      
-      // Sign out from Supabase
-      await signOut();
-      
-      console.log("✅ [Dashboard] User logged out successfully");
-      
-      // Redirect to home page
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("❌ [Dashboard] Logout error:", error);
-      setIsLoggingOut(false);
-    }
-  };
-
   // Show loading screen while flushing pending scan after payment
   if (isFlushingPendingScan) {
     return (
@@ -191,22 +169,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header with Logout button */}
-      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4">
-          <h2 className="text-lg font-semibold">Dashboard</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            {isLoggingOut ? "Logging out..." : "Log out"}
-          </Button>
-        </div>
-      </div>
+      {/* Header with hamburger menu */}
+      <AppHeader title="Dashboard" />
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto">

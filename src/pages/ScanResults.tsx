@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Eye, CircleDashed, LogOut } from "lucide-react";
+import { CircleDashed } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSignedUrl } from "@/lib/photoUpload";
 import { normalizeScores, formatScore, getProgressValue } from "@/lib/normalizeScores";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 interface ScanData {
   id: string;
@@ -20,10 +20,9 @@ interface ScanData {
 export default function ScanResults() {
   const { scanId } = useParams();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [scan, setScan] = useState<ScanData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [frontImageSignedUrl, setFrontImageSignedUrl] = useState<string | null>(null);
   const [sideImageSignedUrl, setSideImageSignedUrl] = useState<string | null>(null);
 
@@ -68,22 +67,6 @@ export default function ScanResults() {
     fetchScan();
   }, [scanId, user, navigate]);
 
-  const handleLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      console.log("🔓 [ScanResults] Logging out user...");
-      
-      localStorage.removeItem("onboarding_data");
-      await signOut();
-      
-      console.log("✅ [ScanResults] User logged out successfully");
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("❌ [ScanResults] Logout error:", error);
-      setIsLoggingOut(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -108,29 +91,9 @@ export default function ScanResults() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-8">
-      {/* Header with navigation and logout */}
-      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4">
-          <button 
-            onClick={() => navigate("/dashboard")} 
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Dashboard
-          </button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            {isLoggingOut ? "Logging out..." : "Log out"}
-          </Button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background text-foreground pb-8 flex flex-col">
+      {/* Header with hamburger menu */}
+      <AppHeader title="Scan Results" />
 
       <div className="px-4 pt-8 space-y-8">
 

@@ -190,3 +190,56 @@ export function getDaysRemaining(subscription: Subscription | null): number {
 export function isTrialing(subscription: Subscription | null): boolean {
   return subscription?.status === "trialing";
 }
+
+/**
+ * Redirects to Stripe Customer Portal for subscription management
+ * Users can update payment method, cancel, or view invoices
+ */
+export async function redirectToCustomerPortal(options?: {
+  returnUrl?: string;
+}): Promise<{ error: string } | void> {
+  try {
+    // Get current session for auth token
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      console.error("[Stripe] No session:", sessionError);
+      return { error: "Please sign in to continue" };
+    }
+
+    console.log("[Stripe] Creating customer portal session...");
+
+    // Call Edge Function to create portal session
+    // TODO: Create this edge function if it doesn't exist yet
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/stripe-customer-portal`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY || "",
+        },
+        body: JSON.stringify({
+          return_url: options?.returnUrl || `${window.location.origin}/dashboard/settings`,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      console.error("[Stripe] Portal error:", data);
+      return { error: data.error || "Failed to open subscription management" };
+    }
+
+    console.log("[Stripe] Portal session created, redirecting...");
+    
+    // Redirect to Stripe Customer Portal
+    window.location.href = data.url;
+
+  } catch (error: any) {
+    console.error("[Stripe] Portal error:", error);
+    return { error: error.message || "Failed to open subscription management" };
+  }
+}

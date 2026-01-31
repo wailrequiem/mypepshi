@@ -16,6 +16,7 @@ import Paywall from "./pages/Paywall";
 import Dashboard from "./pages/Dashboard";
 import NewScan from "./pages/NewScan";
 import ScanResults from "./pages/ScanResults";
+import Settings from "./pages/Settings";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 
@@ -70,6 +71,13 @@ function AnimatedRoutes() {
           <ProtectedRoute>
             <PageTransition>
               <ScanResults />
+            </PageTransition>
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/settings" element={
+          <ProtectedRoute>
+            <PageTransition>
+              <Settings />
             </PageTransition>
           </ProtectedRoute>
         } />
