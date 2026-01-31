@@ -210,7 +210,6 @@ export async function redirectToCustomerPortal(options?: {
     console.log("[Stripe] Creating customer portal session...");
 
     // Call Edge Function to create portal session
-    // TODO: Create this edge function if it doesn't exist yet
     const response = await fetch(
       `${SUPABASE_URL}/functions/v1/stripe-customer-portal`,
       {

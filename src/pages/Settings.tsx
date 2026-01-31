@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
-import { redirectToCustomerPortal } from "@/lib/stripe";
+import { redirectToCustomerPortal, getDaysRemaining } from "@/lib/stripe";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { LogOut, CreditCard, User, AlertTriangle, Loader2, ExternalLink } from "lucide-react";
+import { LogOut, CreditCard, User, AlertTriangle, Loader2, ExternalLink, Clock, Info } from "lucide-react";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ export default function Settings() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isManagingSubscription, setIsManagingSubscription] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Get subscription status display
   const getSubscriptionStatus = () => {
@@ -89,14 +90,17 @@ export default function Settings() {
 
   const handleManageSubscription = async () => {
     try {
+      setError(null);
       setIsManagingSubscription(true);
+      console.log("[Settings] Opening customer portal...");
       const result = await redirectToCustomerPortal();
       if (result?.error) {
         console.error("[Settings] Portal error:", result.error);
-        // TODO: Show toast error
+        setError(result.error);
       }
-    } catch (error) {
-      console.error("[Settings] Portal error:", error);
+    } catch (err: any) {
+      console.error("[Settings] Portal error:", err);
+      setError(err.message || "Failed to open subscription management");
     } finally {
       setIsManagingSubscription(false);
     }
@@ -200,22 +204,65 @@ export default function Settings() {
                 </>
               )}
 
+              {/* Days remaining indicator */}
+              {(isPremium || isTrialing) && subscription && (
+                <>
+                  <Separator />
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      {getDaysRemaining(subscription)} days remaining
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* Cancellation notice */}
+              {subscription?.cancel_at_period_end && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <Info className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-yellow-500">
+                    Your subscription is set to cancel. You'll have access until {formatDate(subscription.current_period_end)}.
+                  </p>
+                </div>
+              )}
+
+              {/* Error message */}
+              {error && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                  <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-sm text-destructive">{error}</p>
+                    {error.includes("No subscription found") && (
+                      <p className="text-xs text-muted-foreground">
+                        Your subscription was set up manually. Contact support to manage it.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <Separator />
               
               {isPremium || isTrialing ? (
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={handleManageSubscription}
-                  disabled={isManagingSubscription}
-                >
-                  {isManagingSubscription ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ExternalLink className="h-4 w-4" />
-                  )}
-                  Manage Subscription
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={handleManageSubscription}
+                    disabled={isManagingSubscription}
+                  >
+                    {isManagingSubscription ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ExternalLink className="h-4 w-4" />
+                    )}
+                    Manage Subscription
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Update payment method, view invoices, or cancel your subscription
+                  </p>
+                </div>
               ) : (
                 <Button
                   className="w-full gap-2"
