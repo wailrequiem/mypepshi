@@ -252,7 +252,7 @@ Then analyze and score these facial aspects (0-100, integers only):
 3. eye_area: shape, symmetry, under-eye bags/dark circles, eyelid health, canthal tilt
 4. jawline_definition: sharpness, angle, definition, mandible prominence, chin projection
 5. facial_symmetry: balance between left/right sides, alignment
-6. potential: realistic improvement potential with lifestyle optimization
+6. potential: improvement potential with skincare, lifestyle, mewing, fitness, grooming
 7. overall: average of all the above scores
 
 CRITICAL SCORING RULES - BE STRICT AND HONEST:
@@ -266,9 +266,16 @@ CRITICAL SCORING RULES - BE STRICT AND HONEST:
   * Asymmetry, droopy eyes, dark circles → eye_area below 50
 - Only exceptional, model-tier features should score above 80
 - Most people should score between 40-65 overall
-- Potential should reflect TRUE improvement capacity (genetics matter)
 - overall should be the rounded average of all 6 aspect scores
 - Never use harsh or insulting language, but BE HONEST
+
+EXCEPTION - POTENTIAL SCORE MUST BE GENEROUS:
+- ALWAYS give potential score between 75-95
+- Everyone can improve with dedication (skincare, weight loss, mewing, grooming, fitness)
+- Even if current features are below average, potential should remain HIGH
+- Low current scores = MORE room for improvement = HIGH potential
+- Be optimistic and motivating about what they can achieve
+- Minimum potential score is 75, aim for 80-90 range typically
 
 SCORING GUIDE:
 - 90-100: Exceptional (top 1%, model-tier)
