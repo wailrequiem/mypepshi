@@ -238,7 +238,7 @@ serve(async (req) => {
     currentStep = "build_request";
     console.log("STEP 5: Building OpenAI request");
 
-    const prompt = `You are an expert facial aesthetics analyzer. Analyze these two images (front and side view) and provide detailed scoring.
+    const prompt = `You are an expert facial aesthetics analyzer with high standards. Analyze these two images (front and side view) and provide detailed, HONEST scoring.
 
 User context:
 - Sex: ${sex === "skip" ? "not specified" : sex}
@@ -247,22 +247,38 @@ User context:
 First, determine the gender (male or female) based on the images.
 
 Then analyze and score these facial aspects (0-100, integers only):
-1. skin_quality: texture, clarity, tone, blemishes
-2. cheekbones: prominence, definition, positioning
-3. eye_area: shape, symmetry, under-eye area, eyelid health
-4. jawline_definition: sharpness, angle, definition
-5. facial_symmetry: balance between left/right sides
+1. skin_quality: texture, clarity, tone, blemishes, acne, pores, wrinkles
+2. cheekbones: prominence, definition, positioning, hollowness
+3. eye_area: shape, symmetry, under-eye bags/dark circles, eyelid health, canthal tilt
+4. jawline_definition: sharpness, angle, definition, mandible prominence, chin projection
+5. facial_symmetry: balance between left/right sides, alignment
 6. potential: realistic improvement potential with lifestyle optimization
 7. overall: average of all the above scores
 
-CRITICAL SCORING RULES:
+CRITICAL SCORING RULES - BE STRICT AND HONEST:
 - All scores are integers 0-100
-- Be realistic but slightly optimistic (this is a paid coaching app)
-- potential should reflect true improvement capacity
+- DO NOT inflate scores - be brutally honest in your assessment
+- Average/mediocre features should score 45-55, not 65-75
+- Visible flaws MUST significantly lower scores:
+  * Acne, scars, uneven skin → skin_quality below 50
+  * Weak/recessed jawline → jawline_definition below 50
+  * Puffy face, no cheekbone definition → cheekbones below 50
+  * Asymmetry, droopy eyes, dark circles → eye_area below 50
+- Only exceptional, model-tier features should score above 80
+- Most people should score between 40-65 overall
+- Potential should reflect TRUE improvement capacity (genetics matter)
 - overall should be the rounded average of all 6 aspect scores
-- Never use harsh or insulting language
+- Never use harsh or insulting language, but BE HONEST
 
-For each aspect (except overall), provide a brief neutral coaching note (1-2 sentences).`;
+SCORING GUIDE:
+- 90-100: Exceptional (top 1%, model-tier)
+- 75-89: Above average (top 15%)
+- 60-74: Slightly above average
+- 45-59: Average
+- 30-44: Below average
+- 0-29: Significant issues
+
+For each aspect (except overall), provide a brief neutral coaching note (1-2 sentences) explaining the score.`;
 
     const requestBody = {
       model: "gpt-4o",
