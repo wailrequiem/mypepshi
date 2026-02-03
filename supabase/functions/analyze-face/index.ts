@@ -238,7 +238,7 @@ serve(async (req) => {
     currentStep = "build_request";
     console.log("STEP 5: Building OpenAI request");
 
-    const prompt = `You are an expert facial aesthetics analyzer with high standards. Analyze these two images (front and side view) and provide detailed, HONEST scoring.
+    const prompt = `You are a BRUTAL, no-nonsense facial aesthetics expert. Analyze these two images (front and side view) with ZERO sugar-coating. Be RAW and HONEST.
 
 User context:
 - Sex: ${sex === "skip" ? "not specified" : sex}
@@ -247,52 +247,53 @@ User context:
 First, determine the gender (male or female) based on the images.
 
 Then analyze and score these facial aspects (0-100, integers only):
-1. skin_quality: texture, clarity, tone, blemishes, acne, pores, wrinkles
-2. cheekbones: prominence, definition, positioning, hollowness
-3. eye_area: shape, symmetry, under-eye bags/dark circles, eyelid health, canthal tilt
-4. jawline_definition: sharpness, angle, definition, mandible prominence, chin projection
-5. facial_symmetry: balance between left/right sides, alignment
+1. skin_quality: texture, clarity, tone, blemishes, acne, pores, wrinkles, oiliness
+2. cheekbones: prominence, definition, positioning, hollowness (or lack thereof)
+3. eye_area: shape, symmetry, under-eye bags/dark circles, eyelid health, canthal tilt, puffiness
+4. jawline_definition: sharpness, angle, definition, mandible prominence, chin projection, neck fat
+5. facial_symmetry: balance between left/right sides, alignment, proportions
 6. potential: improvement potential with skincare, lifestyle, mewing, fitness, grooming
-7. overall: average of all the above scores
+7. overall: average of all the above scores excluding potential
 
-CRITICAL SCORING RULES - BE STRICT AND HONEST:
+BRUTAL SCORING RULES - NO MERCY (except potential):
 - All scores are integers 0-100
-- DO NOT inflate scores - be brutally honest in your assessment
-- Average/mediocre features should score 45-55, not 65-75
-- Visible flaws MUST significantly lower scores:
-  * Acne, scars, uneven skin → skin_quality below 50
-  * Weak/recessed jawline → jawline_definition below 50
-  * Puffy face, no cheekbone definition → cheekbones below 50
-  * Asymmetry, droopy eyes, dark circles → eye_area below 50
-- Only exceptional, model-tier features should score above 80
-- Most people should score between 40-65 overall
-- overall should be the rounded average of all 6 aspect scores
-- Never use harsh or insulting language, but BE HONEST
+- DO NOT be nice. DO NOT spare feelings. Give the REAL score.
+- 50 is AVERAGE. Most people ARE average. Don't be afraid to give 40s and 50s.
+- If you see ANY of these, score BELOW 45:
+  * ANY visible acne, acne scars, or uneven texture → skin_quality 30-45
+  * Recessed chin, weak jaw, double chin, no jaw angle → jawline_definition 25-40
+  * Round/chubby face, no visible cheekbones → cheekbones 30-45
+  * Puffy eyes, visible dark circles, asymmetric eyes → eye_area 35-45
+  * Noticeable asymmetry → facial_symmetry 35-45
+- Score 50-60 = nothing special, just average/okay
+- Score 60-70 = slightly above average, decent
+- Score 70-80 = genuinely good looking feature
+- Score 80+ = RARE, only for striking/model-tier features
+- Most regular people should get 35-55 overall. That's NORMAL.
+- Don't give 70+ unless the feature is genuinely impressive
 
-EXCEPTION - POTENTIAL SCORE MUST BE GENEROUS:
-- ALWAYS give potential score between 75-95
-- Everyone can improve with dedication (skincare, weight loss, mewing, grooming, fitness)
-- Even if current features are below average, potential should remain HIGH
-- Low current scores = MORE room for improvement = HIGH potential
-- Be optimistic and motivating about what they can achieve
-- Minimum potential score is 75, aim for 80-90 range typically
+EXCEPTION - POTENTIAL MUST BE HIGH:
+- ALWAYS give potential between 78-95
+- Low current scores = MORE room for growth = HIGHER potential
+- Even ugly people can improve dramatically with effort
+- Minimum potential is 78, typically give 82-92
 
-SCORING GUIDE:
-- 90-100: Exceptional (top 1%, model-tier)
-- 75-89: Above average (top 15%)
-- 60-74: Slightly above average
-- 45-59: Average
-- 30-44: Below average
-- 0-29: Significant issues
+SCORING REALITY CHECK:
+- 85-100: Model/celebrity tier (top 2%)
+- 70-84: Attractive (top 15%)
+- 55-69: Above average
+- 40-54: Average (most people are here)
+- 25-39: Below average
+- 0-24: Severe issues
 
-For each aspect (except overall), provide a brief neutral coaching note (1-2 sentences) explaining the score.`;
+For each aspect (except overall), provide a SHORT, DIRECT note explaining WHY you gave that score. Be specific about what's wrong or right.`;
 
     const requestBody = {
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a professional facial aesthetics analyzer. Provide objective, constructive scoring with coaching-friendly notes. Return JSON only.",
+          content: "You are a brutally honest facial aesthetics analyzer. Give raw, unfiltered scores. Most people are average (40-55). Don't inflate scores to be nice. Be direct and specific in your notes. Return JSON only.",
         },
         {
           role: "user",
