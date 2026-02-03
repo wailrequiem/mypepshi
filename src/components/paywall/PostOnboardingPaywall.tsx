@@ -22,7 +22,7 @@ interface PostOnboardingPaywallProps {
 
 export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywallProps) {
   const { user } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState<string>("trial");
+  const [selectedPlan, setSelectedPlan] = useState<string>("premium");
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes in seconds
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
@@ -88,14 +88,14 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
 
   const plans = [
     { 
-      id: "trial", 
-      name: "3-Day Full Access Trial", 
+      id: "premium", 
+      name: "Full Premium Access", 
       price: "$1", 
       originalPrice: "$9", 
       perDay: "", 
       highlight: true, 
       badge: "🔥 LIMITED OFFER",
-      description: "Try full premium access for just $1"
+      description: "Get full premium access for just $1"
     },
   ];
 
@@ -341,7 +341,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
                 Processing...
               </>
             ) : user ? (
-              "Start Trial for $1"
+              "Get Premium for $1"
             ) : (
               "Create Account to Continue"
             )}
@@ -354,7 +354,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
           )}
           {user && (
             <p className="text-center text-xs text-muted-foreground mt-3">
-              3 days full access. Cancel anytime.
+              Full access. Cancel anytime.
             </p>
           )}
           {checkoutError && (
@@ -560,7 +560,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
           ) : (
             <Lock className="w-5 h-5" />
           )}
-          {user ? "Start Trial for $1" : "Create Account to Get Plan"}
+          {user ? "Get Premium for $1" : "Create Account to Get Plan"}
         </button>
       </motion.div>
 
@@ -574,13 +574,13 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
         {/* Card 1 - Subscription Disclosure */}
         <div className="glass rounded-2xl p-4 border border-border">
           <h4 className="text-sm font-semibold text-foreground mb-2">
-            How the trial works
+            How it works
           </h4>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <strong>Today:</strong> Pay $1 for instant access to all premium features for 3 days.
+            <strong>Today:</strong> Pay $1 for instant access to all premium features.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-            <strong>After 3 days:</strong> Your subscription automatically renews unless cancelled.
+            Your subscription automatically renews unless cancelled.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
             You can cancel anytime from your account settings or by contacting support - no questions asked.
@@ -653,7 +653,7 @@ export function PostOnboardingPaywall({ onUnlock, gender }: PostOnboardingPaywal
                 onClick={scrollToPricing}
                 className="py-3 px-6 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-sm shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all active:scale-[0.98]"
               >
-                Claim $1 Trial
+                Claim $1 Offer
               </button>
             </div>
           </div>

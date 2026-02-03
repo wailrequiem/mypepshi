@@ -28,7 +28,7 @@ const faqs = [
     answer: "Yes! PepMaxx works on any modern smartphone, tablet, or computer with a camera. Our responsive design ensures a seamless experience across all devices.",
   },
   {
-    question: "Is there a free trial available?",
+    question: "Can I try it for free?",
     answer: "Yes, you can get your first facial analysis completely free. This includes a detailed breakdown of your features and initial recommendations. Premium features are available with our subscription plans.",
   },
 ];
