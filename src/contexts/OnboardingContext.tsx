@@ -31,6 +31,7 @@ interface OnboardingContextType {
   markCompleted: () => void;
   resetOnboarding: () => void;
   syncToSupabase: () => Promise<void>;
+  completeAndSync: () => Promise<void>;
 }
 
 const defaultData: OnboardingData = {
@@ -136,6 +137,35 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   }, [user, onboardingData]);
 
+  // Complete onboarding and sync to Supabase in one call
+  // This ensures completed: true is saved to the database immediately
+  const completeAndSync = useCallback(async () => {
+    const completedData = {
+      ...onboardingData,
+      completed: true,
+    };
+    
+    // Update local state
+    setOnboardingData(completedData);
+    
+    // Sync to Supabase immediately with the completed flag
+    if (user) {
+      try {
+        console.log("[OnboardingContext] Syncing completed onboarding to Supabase...");
+        await supabase.from("profiles").upsert({
+          id: user.id,
+          onboarding_json: completedData,
+          updated_at: new Date().toISOString(),
+        });
+        console.log("[OnboardingContext] ✅ Onboarding synced with completed: true");
+      } catch (error) {
+        console.error("[OnboardingContext] Failed to sync completed onboarding:", error);
+      }
+    } else {
+      console.log("[OnboardingContext] No user, skipping Supabase sync");
+    }
+  }, [user, onboardingData]);
+
   const resetOnboarding = useCallback(() => {
     setOnboardingData(defaultData);
     localStorage.removeItem(STORAGE_KEY);
@@ -159,6 +189,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         markCompleted,
         resetOnboarding,
         syncToSupabase,
+        completeAndSync,
       }}
     >
       {children}
@@ -180,5 +211,6 @@ export function useOnboarding() {
     markCompleted: context.markCompleted,
     resetOnboarding: context.resetOnboarding,
     syncToSupabase: context.syncToSupabase,
+    completeAndSync: context.completeAndSync,
   };
 }

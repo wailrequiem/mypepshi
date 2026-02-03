@@ -92,7 +92,7 @@ const stepOrder: OnboardingStep[] = [
 ];
 
 export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps) {
-  const { setAnswer, onboardingData, setCurrentStep, markCompleted, syncToSupabase } = useOnboarding();
+  const { setAnswer, onboardingData, setCurrentStep, completeAndSync } = useOnboarding();
   const [currentStep, setCurrentStepState] = useState<OnboardingStep>(
     (onboardingData.current_step as OnboardingStep) || "gender"
   );
@@ -210,10 +210,6 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
     console.log("🎯 [OnboardingFlow] handleComplete called");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     
-    // Mark onboarding as completed
-    markCompleted();
-    console.log("✅ [OnboardingFlow] Onboarding marked as completed");
-    
     // Load guest photos from localStorage
     const guestPhotos = loadGuestPhotos();
     console.log("📸 [OnboardingFlow] Guest photos:", guestPhotos ? "Found" : "Not found");
@@ -223,7 +219,7 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
       
       // Save everything as pending scan (onboarding + photos)
       const saved = savePendingScan({
-        onboarding: onboardingData,
+        onboarding: { ...onboardingData, completed: true },
         frontImage: guestPhotos.frontPhotoBase64,
         sideImage: guestPhotos.sidePhotoBase64,
       });
@@ -233,11 +229,12 @@ export function OnboardingFlow({ onComplete, onLoginClick }: OnboardingFlowProps
       } else {
         console.error("❌ [OnboardingFlow] Failed to save pending scan");
       }
-    } else {
-      console.warn("⚠️ [OnboardingFlow] No guest photos found, syncing onboarding data only");
-      // Fallback: sync onboarding data to Supabase if user is already logged in
-      await syncToSupabase();
     }
+    
+    // Mark onboarding as completed AND sync to Supabase in one call
+    // This ensures completed: true is saved to the database
+    await completeAndSync();
+    console.log("✅ [OnboardingFlow] Onboarding marked as completed and synced");
     
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log("🚀 [OnboardingFlow] Calling onComplete callback...");

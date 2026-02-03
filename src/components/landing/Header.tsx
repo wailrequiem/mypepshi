@@ -55,8 +55,22 @@ export function Header() {
         const { data: { user: currentUser } } = await import("@/lib/supabase").then(m => m.supabase.auth.getUser());
         
         if (currentUser) {
-          const redirectPath = await getAuthRedirectPath(currentUser.id);
-          navigate(redirectPath);
+          // Fetch access state directly for reliability
+          const accessState = await getAccessState(currentUser.id);
+          
+          console.log("[handleAuthSuccess] Access state:", accessState);
+          
+          // Route based on state:
+          // 1. Has paid -> Dashboard
+          // 2. Completed onboarding but not paid -> Paywall
+          // 3. Not completed onboarding -> Onboarding
+          if (accessState.hasPaid) {
+            navigate('/dashboard');
+          } else if (accessState.onboardingCompleted) {
+            navigate('/paywall');
+          } else {
+            navigate('/onboarding');
+          }
         } else {
           navigate('/onboarding');
         }
@@ -64,7 +78,7 @@ export function Header() {
         console.error("Error getting redirect path:", error);
         navigate('/onboarding');
       }
-    }, 100);
+    }, 300);
   };
 
   const handleUserButtonClick = () => {

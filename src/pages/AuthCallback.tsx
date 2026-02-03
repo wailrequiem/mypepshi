@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAuthRedirectPath } from "@/lib/accessState";
+import { getAccessState } from "@/lib/accessState";
 
 /**
  * AuthCallback - Handles OAuth redirect and routes users based on access state.
@@ -29,10 +29,24 @@ export default function AuthCallback() {
       }
 
       try {
-        // Get the correct redirect path based on user's state
-        const redirectPath = await getAuthRedirectPath(user.id);
-        console.log(`[AuthCallback] Redirecting to ${redirectPath}`);
-        navigate(redirectPath, { replace: true });
+        // Get the user's access state
+        const accessState = await getAccessState(user.id);
+        console.log("[AuthCallback] Access state:", accessState);
+        
+        // Route based on state:
+        // 1. Has paid -> Dashboard
+        // 2. Completed onboarding but not paid -> Paywall
+        // 3. Not completed onboarding -> Onboarding
+        if (accessState.hasPaid) {
+          console.log("[AuthCallback] User has paid, redirecting to dashboard");
+          navigate("/dashboard", { replace: true });
+        } else if (accessState.onboardingCompleted) {
+          console.log("[AuthCallback] Onboarding completed but not paid, redirecting to paywall");
+          navigate("/paywall", { replace: true });
+        } else {
+          console.log("[AuthCallback] Onboarding not completed, redirecting to onboarding");
+          navigate("/onboarding", { replace: true });
+        }
       } catch (error) {
         console.error("[AuthCallback] Error getting redirect path:", error);
         // Default to onboarding on error

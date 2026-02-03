@@ -74,7 +74,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 min-h-screen bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
           onClick={onClose}
         >
           <motion.div
@@ -82,7 +82,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-background border border-border rounded-2xl p-6 space-y-6"
+            className="w-full max-w-md bg-background border border-border rounded-2xl p-6 space-y-6 my-auto"
           >
             <div className="flex items-center justify-between">
               <div>
